@@ -1,0 +1,15 @@
+{
+    "manifest_version": 2,
+    "name": "Line Feeder",
+    "description": "Stores jsut a line",
+    "browser_action": {
+        "default_popup": "index.html"
+    },
+    "version": "1.0.0",
+    
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "storage"
+    ]
+}
