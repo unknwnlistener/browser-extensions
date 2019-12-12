@@ -1,3 +1,5 @@
+// Static saving of current open URLs in browser on button click
+
 // this.document.getElementById('save').onclick = function() {
 // chrome.tabs.onUpdated.addListener( function( tabId,  changeInfo,  tab) {
 //     chrome.extension.getBackgroundPage().console.log(tabId, tab);
@@ -28,17 +30,22 @@ window.onload = function () {
             let utcDate = new Date(Date.now());
 
             let urlList = [];
-            chrome.storage.sync.get('urlList', function(data) {
-                urlList = data;
-            });
+            // chrome.storage.sync.get('urlList', function(data) {
+            //     urlList = data;
+            // });
             // if(urlList == "undefined") {
-                urlList = [];
+            //     urlList = [];
             // }
+
+            //Reset urlList
+            chrome.storage.sync.set({'urlList': null});
+
             tabs.forEach(tab => {
                 if(tab.status == "complete") {
                     urlList.push({"date": utcDate.toString(), "url": tab.url, "id": tab.id, "active":tab.active});
                 }
             });
+            console.log("Set url list", urlList);
             chrome.storage.sync.set({'urlList': urlList});
         });
     };
@@ -47,8 +54,11 @@ window.onload = function () {
         chrome.storage.sync.get('urlList', function(data) {
             console.log(data);
             let newUrlList = data.urlList;
-            console.log('new url list : '+newUrlList);
+            console.log('new url list : ', newUrlList);
             let displayDiv = document.getElementById('url-list-display');
+            
+            //reset HTML
+            displayDiv.innerHTML = '';
 
             newUrlList.forEach(element => {
                 displayDiv.innerHTML += `<div>

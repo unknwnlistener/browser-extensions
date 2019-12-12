@@ -8,9 +8,13 @@
     <style>
         body{
             background: #eeffee;
+            max-width: 400px;
+            max-height: 300px;
         }
         .table-display {
             margin-top: 5px;
+            max-height: inherit;
+            overflow: auto;
         }
         .table-display div {
             display: block;
@@ -18,15 +22,14 @@
             border: black 1px dotted;
         }
     </style>
-    <script src="main.js"></script>
+    <script src="mainDynamic.js"></script>
 </head>
 <body>
-    <input type="button" id="saveAll" value="Save all URLs">
-    <input type="button" id="getValue" value="Get URL List">
-    <div>
-        <div class="table-display" id="url-list-display">
-            
-        </div>
+    <h3>Current Active Links:</h3>
+    <!-- <input type="button" id="saveAll" value="Save all URLs">
+    <input type="button" id="getValue" value="Get URL List"> -->
+    <div class="table-display" id="url-list-display">
+        
     </div>
 </body>
 </html>
