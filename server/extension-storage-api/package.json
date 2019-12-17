@@ -1,0 +1,32 @@
+{
+  "name": "extension-storage-api",
+  "version": "1.0.0",
+  "description": "Server side for storage to MongoDB through Node.js for chrome extensions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "url": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/unknwnlistener/browser-extensions.git"
+  },
+  "keywords": [
+    "ExtensionAPI",
+    "Chrome",
+    "Extensions"
+  ],
+  "author": "Nischal Abraham",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/unknwnlistener/browser-extensions/issues"
+  },
+  "homepage": "https://github.com/unknwnlistener/browser-extensions#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.8.1"
+  }
+}
