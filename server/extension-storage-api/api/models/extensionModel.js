@@ -4,20 +4,23 @@ var Schema = mongoose.Schema;
 
 
 var SiteSchema = new Schema({
-  url: {
-    type: String,
-    required: 'Kindly enter the URL'
-  },
-  tab_id: Number,
-  title: String,
-  created_date: {
-    type: Date,
-    default: Date.now
-  },
-  active: {
-      type: Boolean,
-      default: false
-  }
+    session: [{
+        url: {
+            type: String,
+            required: 'Kindly enter the URL'
+        },
+        tab_id: Number,
+        title: String,
+        active: {
+            type: Boolean,
+            default: false
+        }
+
+    }],
+    created_date: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 mongoose.model('Sites', SiteSchema);

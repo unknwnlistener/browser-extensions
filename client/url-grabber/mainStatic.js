@@ -42,11 +42,12 @@ window.onload = function () {
 
             tabs.forEach(tab => {
                 if(tab.status == "complete") {
-                    urlList.push({"date": utcDate.toString(), "url": tab.url, "id": tab.id, "active":tab.active});
+                    urlList.push({ "url": tab.url, "tab_id": tab.id, "active":tab.active });
                 }
             });
-            console.log("Set url list", urlList);
-            chrome.storage.sync.set({'urlList': urlList});
+            let session = { "session": urlList, "created_date": utcDate.toUTCString()};
+            console.log("Set url list", session);
+            chrome.storage.sync.set({'urlList': session});
         });
     };
     
