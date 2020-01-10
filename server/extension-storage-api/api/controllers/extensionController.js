@@ -5,6 +5,7 @@ var mongoose = require('mongoose'),
     Site = mongoose.model('Sites');
 
 exports.list_all_sites = function (req, res) {
+    console.log("GET call invoked");
     Site.find({}, function (err, task) {
         if (err)
             res.send(err);
@@ -14,6 +15,7 @@ exports.list_all_sites = function (req, res) {
 
 
 exports.create_new_sites = function (req, res) {
+    console.log("POST call invoked");
     // let reqBody = req.body;
     console.log("Updating database with new sites", req.body);
     // if (Array.isArray(reqBody)) {

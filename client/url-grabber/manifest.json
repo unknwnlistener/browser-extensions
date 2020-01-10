@@ -10,7 +10,7 @@
         "tabs",
         "activeTab",
         "storage",
-        "http://*/*",
-        "https://*/*"
+        "https://*/*",
+        "http://localhost:3000/*"
     ]
 }
