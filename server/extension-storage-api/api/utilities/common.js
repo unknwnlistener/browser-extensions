@@ -5,6 +5,10 @@ Input Parameters:   res: response of the api call to send final data structure
                     value: data value to be passed
                     err_type: type of error criticalness
                     err_msg: frontend error message display help
+
+[TODO] New format:     status: success, failure
+                data: actual for success, error stuff for failure
+                message: one line summary message
 */
 
 // [TODO] Chaining multiple errors by pushing them. Currently only one even though its an array.

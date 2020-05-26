@@ -12,8 +12,10 @@ mongoose.Promise = global.Promise;
 mongoose.connect('mongodb+srv://cs20108admin:fkAFVJSWTWPOHSgg@cluster0-i4i3t.mongodb.net/test?retryWrites=true&w=majority', (err) => { //Change path to Atlas
     if(err) { throw err; }
 }); 
-console.log("Connected successfully");
+console.log("DB Connected successfully");
 
+var swagger = require('./swagger'); // configure swagger
+swagger(app);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
