@@ -1,6 +1,7 @@
 'use strict';
 var mongoose = require('mongoose');
 var idValidator = require('mongoose-id-validator');
+const autoIncrement = require('mongoose-sequence')(mongoose);
 
 var Schema = mongoose.Schema;
 
@@ -13,5 +14,6 @@ var userSchema = new Schema({
 });
 
 userSchema.plugin(idValidator);
+userSchema.plugin(autoIncrement, {inc_field: 'userId'});
 
 module.exports = mongoose.model('user', userSchema);

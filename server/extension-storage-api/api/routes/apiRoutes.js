@@ -12,14 +12,15 @@ const actionController = require('../controllers/actionController');
  *         type: integer
  *       action:
  *         type: string
+ *         enum: [url, mouse, key, tab_opened, tab_closed, tab_switch]
  *       tab:
  *         type: string
  *       url:
  *         type: string
  *       mouse_x:
- *         type: string
+ *         type: number
  *       mouse_y:
- *         type: string
+ *         type: number
  *       keys:
  *         type: string
  */
@@ -27,7 +28,7 @@ const actionController = require('../controllers/actionController');
 // Action Routes
 /**
  * @swagger
- * /api/actions:
+ * /actions:
  *   get:
  *     tags:
  *       - Actions
@@ -48,7 +49,7 @@ const actionController = require('../controllers/actionController');
  *       - application/json
  *     parameters:
  *       - name: action
- *         description: actions are reated based on their type
+ *         description: actions are related based on their type
  *         in: body
  *         required: true
  *         schema:

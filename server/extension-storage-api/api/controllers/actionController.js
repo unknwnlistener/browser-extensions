@@ -20,9 +20,13 @@ exports.list_all_actions = (req, res) => {
 exports.create_new_action = function (req, res) {
     console.log("%s POST call invoked", consolePrefix);
     // let reqBody = req.body;
-    console.log(consolePrefix + "Updating database with new sites", req.body);
-
-    common.result_send(res, { message: 'Post call invoked' }, null);
+    console.log(consolePrefix + "New action : ", req.body);
+    let new_action = new Action(req.body);
+    new_action.save((err, saveRes) => {
+        if(err) return common.result_send(res, null, err, 400, err.message);
+        return common.result_send(res, saveRes, null, undefined, 'New action created');
+    });
+    
 };
 
 /* #endregion */

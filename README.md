@@ -25,3 +25,8 @@ Follow these steps to start node server:
 ###### Mongoose
 - https://code.tutsplus.com/articles/an-introduction-to-mongoose-for-mongodb-and-nodejs--cms-29527
 - https://mongoosejs.com/docs/guide.html#timestamps
+- https://github.com/ramiel/mongoose-sequence
+
+###### Swagger
+- https://mherman.org/blog/swagger-and-nodejs/
+- https://swagger.io/specification/
