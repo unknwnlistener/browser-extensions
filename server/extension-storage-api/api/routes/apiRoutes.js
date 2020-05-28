@@ -8,8 +8,6 @@ const actionController = require('../controllers/actionController');
  * definitions:
  *   actions:
  *     properties:
- *       user_id:
- *         type: integer
  *       action:
  *         type: string
  *         enum: [url, mouse, key, tab_opened, tab_closed, tab_switch]
@@ -28,7 +26,7 @@ const actionController = require('../controllers/actionController');
 // Action Routes
 /**
  * @swagger
- * /actions:
+ * /users/actions:
  *   get:
  *     tags:
  *       - Actions
@@ -41,6 +39,28 @@ const actionController = require('../controllers/actionController');
  *         schema:
  *           $ref: '#/definitions/actions'
  * 
+ */
+router.get('/users/actions',actionController.list_all_actions);
+
+// All user actions for a single user
+/**
+ * @swagger
+ * /users/{id}/actions:
+ *   get:
+ *     tags:
+ *       - Actions
+ *     description: Returns all actions for specific user
+ *     parameters:
+ *       - name: id
+ *         required: true
+ *         in: path
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: An array of actions
+ *         schema:
+ *           $ref: '#/definitions/actions'
  *   post:
  *     tags:
  *       - Actions
@@ -48,6 +68,9 @@ const actionController = require('../controllers/actionController');
  *     consumes:
  *       - application/json
  *     parameters:
+ *       - name: id
+ *         required: true
+ *         in: path
  *       - name: action
  *         description: actions are related based on their type
  *         in: body
@@ -58,8 +81,8 @@ const actionController = require('../controllers/actionController');
  *       200:
  *         description: Successfully created
  */
-router.get('/actions',actionController.list_all_actions)
-router.post('/actions',actionController.create_new_action);
+router.get('/users/:userId/actions', actionController.list_user_actions);
+router.post('/users/:userId/actions',actionController.create_new_action); 
 
 
 module.exports = router;

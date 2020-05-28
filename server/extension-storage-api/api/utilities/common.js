@@ -52,3 +52,7 @@ exports.result_send = (res, value, err, statusCode=200, message="") => {
         return res.send(result);
     }
 }
+
+exports.error_send = (res, err, statusCode=404) => {
+    this.result_send(res, null, err, statusCode, err.message)
+}

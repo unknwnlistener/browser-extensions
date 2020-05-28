@@ -9,7 +9,7 @@ var port = process.env.PORT || 3000;
 
 // mongoose instance connection url connection
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb+srv://cs20108admin:fkAFVJSWTWPOHSgg@cluster0-i4i3t.mongodb.net/test?retryWrites=true&w=majority', (err) => { //Change path to Atlas
+mongoose.connect('mongodb+srv://cs20108admin:fkAFVJSWTWPOHSgg@cluster0-i4i3t.mongodb.net/webrecorder?retryWrites=true&w=majority', (err) => { //Change path to Atlas
     if(err) { throw err; }
 }); 
 console.log("DB Connected successfully");
