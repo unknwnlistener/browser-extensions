@@ -8,9 +8,12 @@ Follow these steps to start node server:
 * Open `localhost:3000` in a browser
 
 ### Current Routes
-* `/api/actions` 
-    - `GET` call to retrieve all actions
-    - `POST` call to add a new action
+* `/api/users/actions` 
+    - `GET` call to retrieve all actions for all users
+
+* `api/users/:id/actions`
+    - `GET` call to retrieve all actions for a specific user id
+    - `POST` call to create a new action entry
 
 
 ### Resources

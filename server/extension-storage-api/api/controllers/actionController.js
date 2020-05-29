@@ -26,6 +26,12 @@ exports.list_user_actions = (req, res) => {
     });
 }
 
+exports.list_all_users = (req,res) => {
+    console.log("%s GET all users", consolePrefix);
+
+    //[TODO] This can only be done if a separate user model is established and connected
+}
+
 /* #endregion */
 
 /* #region  POST calls */
