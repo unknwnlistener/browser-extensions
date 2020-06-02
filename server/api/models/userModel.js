@@ -5,6 +5,7 @@ const autoIncrement = require('mongoose-sequence')(mongoose);
 
 var Schema = mongoose.Schema;
 
+//_id hidden from the front end. Will be using userID for all transactional processes
 var userSchema = new Schema({
     // userId: {type: Number, } // [TODO] Generated on creation somehow
     name: {type: String, required: [true, 'Name is required']}, 
@@ -14,6 +15,7 @@ var userSchema = new Schema({
 });
 
 userSchema.plugin(idValidator);
+ //Plugin automatically creates field userID which will be auto-incremented
 userSchema.plugin(autoIncrement, {inc_field: 'userId'});
 
 module.exports = mongoose.model('user', userSchema);

@@ -6,3 +6,7 @@ node_modules/
 
 #-lock files
 *-lock.*
+
+#Ignore sass files for now
+*.scss
+*.css.map

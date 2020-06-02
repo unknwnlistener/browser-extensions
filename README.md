@@ -4,7 +4,7 @@ Testing Chrome extension projects
 ### Usage
 Follow these steps to start node server:
 * Go to root folder of project
-* Run `node .\server\extension-storage-api\server.js` on the terminal
+* Run `node .\server\server.js` on the terminal
 * Open `localhost:3000` in a browser
 
 ### Current Routes
@@ -33,3 +33,11 @@ Follow these steps to start node server:
 ###### Swagger
 - https://mherman.org/blog/swagger-and-nodejs/
 - https://swagger.io/specification/
+
+
+###### Sass
+- https://htmlmag.com/article/an-introduction-to-css-preprocessors-sass-less-stylus
+- https://sass-lang.com/guide
+
+###### Material Design
+- https://material.io/design/color/the-color-system.html#tools-for-picking-colors
