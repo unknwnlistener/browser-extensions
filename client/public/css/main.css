@@ -1,0 +1,104 @@
+html {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+body {
+  height: 100vh;
+  background-color: white;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/*Navbar*/
+.navbar {
+  color: white;
+  position: sticky;
+  width: 100%;
+  margin-top: 0;
+  height: 52px;
+  background-color: #00a105;
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+}
+.navbar .logo {
+  margin: 5px;
+  padding: 5px;
+  float: left;
+}
+.navbar .navbar-items {
+  float: right;
+  position: relative;
+  margin-right: 2rem;
+  text-transform: capitalize;
+  padding: 10px 0px;
+}
+.navbar .navbar-items p {
+  cursor: pointer;
+  display: inline;
+  padding: 5px;
+  text-decoration: underline;
+  font-size: larger;
+}
+
+/*Main content section*/
+.main {
+  margin: 10px;
+  padding: 0px 10px;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.main .text-section {
+  width: 45%;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+.main .form-section {
+  position: relative;
+  width: 45%;
+  margin: auto 0px;
+  padding: 20px;
+  border: 1px solid black;
+  border-collapse: collapse;
+  height: 40%;
+}
+.main .form-section form {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-evenly;
+}
+.main .form-section form label {
+  font-size: larger;
+  margin-bottom: 2px;
+}
+.main .form-section form input {
+  padding: 3px;
+  margin-bottom: 20px;
+  max-width: 300px;
+}
+
+.btn {
+  font-size: larger;
+  padding: 5px;
+  margin-top: 5px;
+  max-width: 100px;
+  background-color: #a1009c;
+  color: white;
+  border: 0px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/*Footer*/
+footer {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  margin-top: auto;
+  text-align: end;
+}
+
+/*# sourceMappingURL=main.css.map */
