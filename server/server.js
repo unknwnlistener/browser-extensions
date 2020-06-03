@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 require('./api/models/actionModel').default; //importing Model
+require('./api/models/userModel').default; //importing Model
 
 var port = process.env.PORT || 3000;
 

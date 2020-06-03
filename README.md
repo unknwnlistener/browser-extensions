@@ -15,6 +15,9 @@ Follow these steps to start node server:
     - `GET` call to retrieve all actions for a specific user id
     - `POST` call to create a new action entry
 
+* `api/users`
+    - `GET` call to retrieve all users in system [TODO] Add permissions to this call
+    - `POST` call to create a new user
 
 ### Resources
 ###### Node.js

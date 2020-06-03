@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const actionController = require('../controllers/actionController');
+const userController = require('../controllers/userController');
 
 /**
  * @swagger
@@ -20,6 +21,14 @@ const actionController = require('../controllers/actionController');
  *       mouse_y:
  *         type: number
  *       keys:
+ *         type: string
+ *   users:
+ *     properties:
+ *       name:
+ *         type: string
+ *       password:
+ *         type: string
+ *       email:
  *         type: string
  */
   
@@ -84,5 +93,41 @@ router.get('/users/actions',actionController.list_all_actions);
 router.get('/users/:userId/actions', actionController.list_user_actions);
 router.post('/users/:userId/actions',actionController.create_new_action); 
 
+
+// User Routes
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     tags:
+ *       - Users
+ *     description: Returns all users
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: An array of users
+ *         schema:
+ *           $ref: '#/definitions/users'
+ * 
+ *   post:
+ *     tags:
+ *       - Users
+ *     description: Creates a new user
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - name: user
+ *         description: Basic user information
+ *         in: body
+ *         required: true
+ *         schema:
+ *           $ref: '#/definitions/users'
+ *     responses:
+ *       200:
+ *         description: Successfully created
+ */
+router.get('/users',userController.list_all_users);
+router.post('/users',userController.create_new_user);
 
 module.exports = router;
