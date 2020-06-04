@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 const actionTypes = Object.freeze({'url':'url','mouse':'mouse','key':'key','tabOpen':'tab_opened','tabClose':'tab_closed','tabSwitch':'tab_switch'});
 
 var ActionSchema = new Schema({
-    user_id: { type: Number, default: false },
+    userId: { type: Schema.Types.ObjectId, ref: 'Users', required: [true, 'User is required'] },
     action: { type: String, default: 'url', required: true, enum: Object.values(actionTypes)},
     tab: { type: String, required: function(){ return [actionTypes.tabOpen, actionTypes.tabClose, actionTypes.tabSwitch].includes(this.action) }},
     url: { type: String, required: function(){ return this.action == actionTypes.url }},
