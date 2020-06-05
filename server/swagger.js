@@ -11,6 +11,13 @@ module.exports = (app) => {
             description: 'Tool for recording user data to quantify browser behaviour',
         },
         basePath: '/api',
+        securityDefinitions: {
+            Bearer: {
+                type: "apiKey",
+                name: "Authorization",
+                in: "header"
+            }
+        },
     };
     
     // options for the swagger docs

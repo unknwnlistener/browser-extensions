@@ -11,7 +11,7 @@ var userSchema = new Schema({
     name: {type: String, required: [true, 'Name is required']},
     password: {type: String, required: [true, 'Password is required']},
     email: {type: String, required: [true, 'Email is required'], unique: true, validate: {validator: (v) => {
-        /^([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)@(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v);
+        /^([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)@(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/.test(v);
     }}, set: x => x.toLowerCase()}, //Email validation includes check for email format and converts all case to lowercase
     isAdmin: {type: Boolean, default: false}
 },

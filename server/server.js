@@ -22,7 +22,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 
-var api = require('./api/routes/apiRoutes'); //importing routes
+let auth = require('./api/routes/authRoutes');
+app.use('/api', auth);
+
+let api = require('./api/routes/apiRoutes'); //importing routes
 app.use('/api', api); //register the route
 
 app.use(function(req, res) {

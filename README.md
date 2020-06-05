@@ -10,10 +10,10 @@ Follow these steps to start node server:
 ### Current Routes
 * `/api/users/actions` 
     - `GET` call to retrieve all actions for all users
+    - `POST` call to create a new action entry for current user
 
 * `api/users/:id/actions`
     - `GET` call to retrieve all actions for a specific user id
-    - `POST` call to create a new action entry
 
 * `api/users`
     - `GET` call to retrieve all users in system [TODO] Add permissions to this call
@@ -44,3 +44,7 @@ Follow these steps to start node server:
 
 ###### Material Design
 - https://material.io/design/color/the-color-system.html#tools-for-picking-colors
+
+###### Express
+- Async/Await - https://medium.com/@Abazhenov/using-async-await-in-express-with-node-8-b8af872c0016
+    - In JS - https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9

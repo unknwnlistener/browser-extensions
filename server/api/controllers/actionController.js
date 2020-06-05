@@ -10,9 +10,10 @@ const consolePrefix = '[ACTION][CONTROLLER]';
 in temporal order (latest entry first, first entry last): 
 */
 exports.list_all_actions = (req, res) => {
-    console.log("%s GET call invoked", consolePrefix);
-    Action.find({}, { limit: 5, sort: 'created_at'}, function (err, action) { //[TODO] Update limit of this call. Testing = 5
-        common.result_send(res, action, err);
+    console.log("%s Returning all actions for all users", consolePrefix);
+    Action.find({}, null, {limit: 5, sort: '-created_at'}, (err, actions) => { //[TODO] Update limit of this call. Testing = 5
+        if(err) return common.error_send(res, err, 404);
+        return common.result_send(res, actions, null, 200, "Returning actions for all users");
     });
 };
 
@@ -20,16 +21,10 @@ exports.list_user_actions = (req, res) => {
     let userId = req.params.userId;
     console.log("%s GET user id: %d actions", consolePrefix, userId);
     
-    Action.find({ user_id: userId }, (err, actions) => {
+    Action.find({ userId: userId }, (err, actions) => {
         if (err) return common.error_send(res, err, 404);
         return common.result_send(res, actions, null, 200, "Returning specific user\'s actions");
     });
-}
-
-exports.list_all_users = (req,res) => {
-    console.log("%s GET all users", consolePrefix);
-
-    //[TODO] This can only be done if a separate user model is established and connected
 }
 
 /* #endregion */
@@ -37,14 +32,12 @@ exports.list_all_users = (req,res) => {
 /* #region  POST calls */
 
 exports.create_new_action = (req, res) => {
+    let currentUser = req.userId;
     console.log("%s POST call invoked", consolePrefix);
-    // let reqBody = req.body;
     console.log(consolePrefix + "New action : ", req.body);
-    if (!req.params.userId) {
-        return common.error_send(res, { message: 'Invalid parameters passed' }, 400);
-        //[TODO] COnnect this call to the userModel DB structure for new users
-    }
-    req.body.user_id = req.params.userId;
+
+    // [TODO] Shift all these actions to its own repositories
+    req.body.userId = currentUser;
     let new_action = new Action(req.body);
     new_action.save((err, saveRes) => {
         if (err) return common.error_send(res, err, 400);
