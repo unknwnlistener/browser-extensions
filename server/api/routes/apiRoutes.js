@@ -117,8 +117,6 @@ router.get('/users/:userId/actions', authController.verifyToken, actionControlle
  *           $ref: '#/definitions/users'
  * 
  *   post:
- *     security:
- *       - Bearer: []
  *     tags:
  *       - Users
  *     description: Creates a new user
