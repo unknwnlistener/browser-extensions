@@ -6,6 +6,10 @@
         "default_icon": "icon.png",
         "default_popup": "index.html"
     },
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
     "version": "1.0.0",
     "permissions": [
         "tabs",

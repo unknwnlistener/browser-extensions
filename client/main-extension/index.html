@@ -5,33 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>URL Grabber</title>
-    <style>
-        body{
-            background: #eeffee;
-            max-width: 400px;
-            max-height: 300px;
-        }
-        .table-display {
-            margin-top: 5px;
-            max-height: inherit;
-            overflow: auto;
-        }
-        .table-display div {
-            display: block;
-            padding: 4px;
-            border: black 1px dotted;
-        }
-    </style>
+    <link rel="stylesheet" href="./css/main.css">
 </head>
 <body>
-    <h3>Current Active Links:</h3>
-    <input type="button" id="saveAll" value="Save all URLs">
-    <input type="button" id="getValue" value="Get URL List">
-    <div class="table-display" id="url-list-display">
-        
+    <div class="main">
+        <section class="form-title">Sign In</section>
+        <section class="form-section">
+            <form class="form-main">
+                <div>
+                    <label for="username">Email:</label>
+                    <input type="text" name="email" id="email">
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" id="password">
+                </div>
+                <input type="button" id="login" class="btn" type="submit" value="Log In">
+            </form>
+        </section>
+        <span class="register" id="register">New user?</span>
     </div>
     
-    <script src="jquery-3.4.1.min.js"></script>
-    <script src="mainRestApi.js"></script>
+    <script src="./jquery-3.4.1.min.js"></script>
+    <script src="./mainRestApi.js"></script>
 </body>
 </html>
