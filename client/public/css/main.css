@@ -6,12 +6,14 @@ html {
 
 body {
   height: 100vh;
-  background-color: white;
   font-family: "Courier New", Courier, monospace;
   font-size: 14px;
   margin: 0;
   display: flex;
   flex-direction: column;
+  background: url("../assets/cover.jpg") white;
+  background: linear-gradient(black, 30%, rgba(0, 0, 0, 0.1)), url("../assets/cover.jpg") no-repeat left top;
+  background-size: cover;
 }
 
 /*Navbar*/
@@ -45,52 +47,85 @@ body {
 }
 
 /*Main content section*/
+label {
+  color: rgba(0, 0, 0, 0.7);
+  margin-bottom: 2px;
+}
+
+input {
+  padding: 10px;
+  border: 0px;
+  background-color: rgba(121, 121, 121, 0.1);
+}
+input:focus {
+  outline: none;
+  border-bottom: 2px inset #0d66d0;
+  background-color: rgba(121, 121, 121, 0.15);
+}
+
 .main {
   margin: 10px;
   padding: 0px 10px;
   height: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
 }
 .main .text-section {
+  background: white;
   width: 45%;
   border: 1px solid black;
   border-collapse: collapse;
 }
 .main .form-section {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
   position: relative;
-  width: 45%;
+  width: 30%;
+  border-radius: 10px;
   margin: auto 0px;
   padding: 20px;
-  border: 1px solid black;
   border-collapse: collapse;
-  height: 40%;
+  height: 60%;
+}
+.main .form-section .form-title {
+  font-size: 30px;
 }
 .main .form-section form {
+  height: 100%;
   display: flex;
   flex-flow: column nowrap;
   justify-content: space-evenly;
 }
-.main .form-section form label {
-  font-size: larger;
-  margin-bottom: 2px;
+.main .form-section form div {
+  display: flex;
+  flex-direction: column;
 }
-.main .form-section form input {
-  padding: 3px;
-  margin-bottom: 20px;
-  max-width: 300px;
+
+.error-msg {
+  color: red;
+  font-size: 12px;
+  display: none;
 }
 
 .btn {
   font-size: larger;
   padding: 5px;
   margin-top: 5px;
-  max-width: 100px;
-  background-color: #a1009c;
+  width: 150px;
+  background-color: #0d66d0;
+  border-color: #0d66d0;
   color: white;
-  border: 0px;
-  border-radius: 5px;
+  border-radius: 16px;
   cursor: pointer;
+}
+.btn:disabled {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: rgba(0, 0, 0, 0.7);
+  cursor: not-allowed;
 }
 
 /*Footer*/

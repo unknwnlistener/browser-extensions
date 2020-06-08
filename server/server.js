@@ -20,7 +20,7 @@ swagger(app);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
+app.use(express.static("../client/public"));
 
 let auth = require('./api/routes/authRoutes');
 app.use('/api', auth);
