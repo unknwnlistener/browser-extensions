@@ -11,7 +11,8 @@
     <div class="main">
         <section class="form-title">Sign In</section>
         <section class="form-section">
-            <form class="form-main">
+            <form class="form-main" id="login-form">
+                <span class="error-msg">Invalid login credentials entered. Try again.</span>
                 <div>
                     <label for="username">Email:</label>
                     <input type="text" name="email" id="email">
@@ -20,13 +21,15 @@
                     <label for="password">Password:</label>
                     <input type="password" name="password" id="password">
                 </div>
-                <input type="button" id="login" class="btn" type="submit" value="Log In">
+                <input type="button" id="login" class="btn" type="submit" value="Log In" disabled>
             </form>
         </section>
         <span class="register" id="register">New user?</span>
     </div>
     
-    <script src="./jquery-3.4.1.min.js"></script>
-    <script src="./mainRestApi.js"></script>
+    <script src="../js/jquery-3.4.1.min.js"></script>
+    <script src="../js/js.cookie.js"></script>
+    <script src="../js/mainRestApi.js"></script>
+    <script src="../js/background.js"></script>
 </body>
 </html>
