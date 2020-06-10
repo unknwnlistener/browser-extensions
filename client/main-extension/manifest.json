@@ -10,9 +10,13 @@
         "default_title": "Web Recorder",
         "default_popup": "index.html"
     },
+    "background": {
+        "scripts": ["./js/jquery-3.4.1.min.js","./js/js.cookie.js","./js/background.js"]
+    },  
     "version": "1.0.0",
     "permissions": [
         "tabs",
+        "cookies",
         "activeTab",
         "storage",
         "https://*/*",

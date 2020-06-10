@@ -14,6 +14,7 @@ $(document).ready(() => {
     $('#logout').click(() => {
         console.log("Logging user out");
         Cookies.remove('token');
+        chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
         location.reload(false);
     });
 
@@ -36,7 +37,7 @@ $(document).ready(() => {
                 }
                 console.log("Packet receieved = ", data);
                 console.log("Cookie set : ", Cookies.get("token"));
-                
+                chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
                 location.reload(false);
             },
             error: () => {
