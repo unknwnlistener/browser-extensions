@@ -6,6 +6,10 @@ $(document).ready(() => {
         $('.main').replaceWith(loggedInMessageHtml());
     }
 
+    readConfig();
+
+    setConfigListeners();
+
     $('#register').click(() => {
         console.log("Register button clicked");
         popupRegister();
@@ -51,29 +55,6 @@ $(document).ready(() => {
         // Save the returned token to cookie. User session is now logged in.
     });
 
-    // $('#getValue').click(() => {
-    //     $.ajax({
-    //         url: `${currentUrl}/api/users/actions`,
-    //         type: "GET",
-    //         headers: {
-    //             'Authorization': `Bearer ${token}`,
-    //         },
-    //         success: function(result) {
-    //             console.log("GET call invoked", result);
-    //             allData = result[0];
-                
-    //             // let newUrlList = allData.session;
-    //             // let sessionDate = allData.created_date;
-    //             // console.log('new url list : ', newUrlList);
-    //             // modifyList(newUrlList, sessionDate);
-    //         },  
-    //         error: function(error) {
-    //             console.log("ERROR : ", error);
-    //         }
-    //     });
-
-    // });
-
 });
 
 function loggedInMessageHtml() {
@@ -108,3 +89,40 @@ function popupRegister() {
     chrome.tabs.create({ url: currentUrl });
 }
 
+function readConfig() {
+    console.log(config);
+
+    $(".settings").html(generateToggleRows());
+}
+
+function generateToggleRows() {
+    let rowCount = 1;
+    let html = '';
+    
+    for (const value in config.actions) {
+        if (config.actions.hasOwnProperty(value)) {
+            const element = config.actions[value];
+            console.log("Element:  %s, Value: %s", element, value);
+            html += `
+            <div class="items item-${rowCount++}">
+                <p class="item-text">${value}</p>
+                <input id="${value}" type="checkbox" class="toggle" ${element?"checked": ""}>
+            </div>`;
+        }
+    }
+
+    return html;
+}
+
+// Updates the config={} object. [TODO] Send that config to server and the server will handle that config to send data
+function setConfigListeners() {
+    $('input:checkbox').change(function(){
+        if(($(this)).is(':checked')) {
+            console.log("Checked config : ",$(this).attr('id'), true);
+            config.actions[$(this).attr('id')] = true;
+        } else {
+            console.log("Unchecked config : ",$(this).attr('id'), false);
+            config.actions[$(this).attr('id')] = false;
+        }
+    });
+}

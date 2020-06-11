@@ -48,3 +48,6 @@ Follow these steps to start node server:
 ###### Express
 - Async/Await - https://medium.com/@Abazhenov/using-async-await-in-express-with-node-8-b8af872c0016
     - In JS - https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9
+
+###### REST APIs
+- Best Practices - https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api

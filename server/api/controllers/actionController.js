@@ -41,7 +41,7 @@ exports.create_new_action = (req, res) => {
     let new_action = new Action(req.body);
     new_action.save((err, saveRes) => {
         if (err) return common.error_send(res, err, 400);
-        return common.result_send(res, saveRes, null, undefined, 'New action created');
+        return common.result_send(res, saveRes, null, 201, 'New action created');
     });
 
 };

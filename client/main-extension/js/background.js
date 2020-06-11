@@ -1,13 +1,3 @@
-// Open a new tab with the url
-// function browserListener() {
-//     chrome.browserAction.onClicked.addListener(function(activeTab)
-//     {
-//         console.log("BACKGROUND : ", activeTab);
-//         var newURL = "http://www.youtube.com/watch?v=oHg5SJYRHA0";
-//         chrome.tabs.create({ url: newURL });
-//     });
-// }
-
 const currentUrl = 'http://localhost:3000';
 
 /* Record and send a post command for every new action
@@ -19,10 +9,10 @@ const currentUrl = 'http://localhost:3000';
 2. POST the action to the server
 
 */
+
 $(document).ready(() => {
     var currentToken = Cookies.get('token');
     console.log("[BACKGROUND] Loaded page", Cookies.get('token'));
-    
     
     let currentWindowId;
     chrome.windows.getCurrent((activeWindow) => {
@@ -41,9 +31,8 @@ $(document).ready(() => {
             // Named callback for the event listener so it can be removed later
             console.log("[BACKGROUND] Adding listener for tabs");
             chrome.tabs.onUpdated.addListener(tabUpdates = (tabId, changeInfo, activeTab) => {
-                // On a complete url change only?
                 if(changeInfo.status === "complete" && activeTab.windowId == currentWindowId) {
-                    if(activeTab.url == "chrome://newtab/") { // New tab
+                    if(activeTab.url == "chrome://newtab/") { // New tab -- Specific to Brave browser?
                         console.log("New Tab");
                         dataObj = {
                             action: 'tab_opened',
@@ -53,9 +42,9 @@ $(document).ready(() => {
                         actionPostApi(currentToken, dataObj);
                     } else { // Url updated
                         // Info to store -- url, tabId, windowId
-                        console.log("TabId : ",tabId);
-                        console.log("Change Info: ",changeInfo);
-                        console.log("Active Tab : ", activeTab);
+                        // console.log("TabId : ",tabId);
+                        // console.log("Change Info: ",changeInfo);
+                        // console.log("Active Tab : ", activeTab);
                         dataObj = {
                             action: 'url',
                             tabId: tabId,
