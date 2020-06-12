@@ -16,36 +16,6 @@ body {
   background-size: cover;
 }
 
-/*Navbar*/
-.navbar {
-  color: white;
-  position: sticky;
-  width: 100%;
-  margin-top: 0;
-  height: 52px;
-  background-color: #00a105;
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
-}
-.navbar .logo {
-  margin: 5px;
-  padding: 5px;
-  float: left;
-}
-.navbar .navbar-items {
-  float: right;
-  position: relative;
-  margin-right: 2rem;
-  text-transform: capitalize;
-  padding: 10px 0px;
-}
-.navbar .navbar-items p {
-  cursor: pointer;
-  display: inline;
-  padding: 5px;
-  text-decoration: underline;
-  font-size: larger;
-}
-
 /*Main content section*/
 label {
   color: rgba(0, 0, 0, 0.7);

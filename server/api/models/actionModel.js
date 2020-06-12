@@ -13,7 +13,8 @@ var ActionSchema = new Schema({
     mouse_x: { type: Number, required: function(){ return this.action == actionTypes.mouse }},
     mouse_y: { type: Number, required: function(){ return this.action == actionTypes.mouse }},
     keys: { type: String, required: function(){ return this.action == actionTypes.key }},
-    windowId: {type: Number, required: true}
+    windowId: {type: Number, required: true},
+    client_timestamp: {type: Date, required: true}
 },
 {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at', currentTime: () => Date.now()}, // [TODO] This may not work. Revisit

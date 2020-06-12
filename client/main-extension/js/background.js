@@ -9,16 +9,21 @@ const currentUrl = 'http://localhost:3000';
 2. POST the action to the server
 
 */
+var currentWindowId;
+var currentToken = Cookies.get('token');
 
 $(document).ready(() => {
-    var currentToken = Cookies.get('token');
     console.log("[BACKGROUND] Loaded page", Cookies.get('token'));
     
-    let currentWindowId;
     chrome.windows.getCurrent((activeWindow) => {
         console.log(activeWindow);
         currentWindowId = activeWindow.id;
     });
+
+    // User already logged in
+    if (currentToken) {
+        addTabListeners();
+    }
     
     // Listener for cookies
     chrome.runtime.onMessage.addListener((request, sender) => {
@@ -27,43 +32,18 @@ $(document).ready(() => {
             currentToken = Cookies.get('token');
         }
         if(currentToken) {
-            // Filtering out tab values not in the active window
-            // Named callback for the event listener so it can be removed later
-            console.log("[BACKGROUND] Adding listener for tabs");
-            chrome.tabs.onUpdated.addListener(tabUpdates = (tabId, changeInfo, activeTab) => {
-                if(changeInfo.status === "complete" && activeTab.windowId == currentWindowId) {
-                    if(activeTab.url == "chrome://newtab/") { // New tab -- Specific to Brave browser?
-                        console.log("New Tab");
-                        dataObj = {
-                            action: 'tab_opened',
-                            tabId: tabId,
-                            windowId: currentWindowId
-                        }
-                        actionPostApi(currentToken, dataObj);
-                    } else { // Url updated
-                        // Info to store -- url, tabId, windowId
-                        // console.log("TabId : ",tabId);
-                        // console.log("Change Info: ",changeInfo);
-                        // console.log("Active Tab : ", activeTab);
-                        dataObj = {
-                            action: 'url',
-                            tabId: tabId,
-                            url: activeTab.url,
-                            windowId: currentWindowId
-                        }
-                        actionPostApi(currentToken, dataObj);
-                    }
-                }
-            });
+            addTabListeners();
         } else {
             console.log("[BACKGROUND] Removed listener for Tabs");
             chrome.tabs.onUpdated.removeListener(tabUpdates);
+            chrome.tabs.onRemoved.removeListener(tabRemoved);
         }
     });
 });
 
 
 function actionPostApi(currentToken, dataObj) {
+    dataObj['client_timestamp'] = Date.now();
     $.ajax({
         url: `${currentUrl}/api/users/actions`,
         type: "POST",
@@ -77,5 +57,44 @@ function actionPostApi(currentToken, dataObj) {
         error: (err) => {
             console.error(err);
         }
+    });
+}
+
+
+function addTabListeners() {
+    // Filtering out tab values not in the active window
+    // Named callback for the event listener so it can be removed later
+    console.log("[BACKGROUND] Adding listener for tabs");
+    chrome.tabs.onUpdated.addListener(tabUpdates = (tabId, changeInfo, activeTab) => {
+        if(changeInfo.status === "complete" && activeTab.windowId == currentWindowId) {
+            if(activeTab.url == "chrome://newtab/") { // New tab -- Specific to Brave browser?
+                dataObj = {
+                    action: 'tab_opened',
+                    tabId: tabId,
+                    windowId: currentWindowId
+                }
+                actionPostApi(currentToken, dataObj);
+            } else { // Url updated
+                // Info to store -- url, tabId, windowId
+                // console.log("TabId : ",tabId);
+                // console.log("Change Info: ",changeInfo);
+                // console.log("Active Tab : ", activeTab);
+                dataObj = {
+                    action: 'url',
+                    tabId: tabId,
+                    url: activeTab.url,
+                    windowId: currentWindowId
+                }
+                actionPostApi(currentToken, dataObj);
+            }
+        }
+    });
+    chrome.tabs.onRemoved.addListener(tabRemoved = (tabId, removeInfo) => {
+        dataObj = {
+            action: 'tab_closed',
+            tabId: tabId,
+            windowId: currentWindowId
+        }
+        actionPostApi(currentToken, dataObj);
     });
 }

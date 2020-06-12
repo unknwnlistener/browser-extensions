@@ -8,3 +8,10 @@ config.actions= {
     mouse_click: false,
     keystrokes: false
 }
+
+// // Call the config from the server
+// $(document).ready(function() {
+//     $.ajax(
+//             { url:  }
+//         )
+// });
