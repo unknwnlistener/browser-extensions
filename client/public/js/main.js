@@ -2,6 +2,11 @@ let isInvalidEmail = true;
 let isInvalidPassword = true;
 
 $(function() {
+
+    $('#email, #password').keyup(() => {
+        enableLoginButton();
+    })
+
     $('#submit').on('click', function(event) {
         if(!isInvalidEmail && !isInvalidPassword) {
             console.log($('#register-form').serialize());
@@ -11,10 +16,12 @@ $(function() {
                 data: $('#register-form').serialize(),
                 success: function (data) {
                     console.log("Success", data);
+                    successfulLogin();
                     // window.location.href = "/dashboard.html";
                 },
                 error: function(err) {
                     console.error(err);
+                    $('#login-error').css('display', 'block');
                 }
             });
             event.preventDefault();
@@ -24,21 +31,39 @@ $(function() {
     });
 });
 
-function checkForm() {
+function enableLoginButton() {
+    let email = $('#email');
+    let password = $('#password');
+
+    if(validateEmail(email.val()) && password.val() && password.val()!='') {
+        $('#submit').removeAttr('disabled');
+    } else {
+        $('#submit').attr('disabled', 'disabled');
+    }
+}
+
+function successfulLogin() {
+    $(".main").html(`
+    <div class="text-section">
+            <h1>Registration successful</h1>
+            <p>You have been registered to use the tool. Enable the extension and login through it to start recording browser actions</p>
+        </div>
+    `);
+}
+
+function emailValidation() {
     let email = document.getElementById('email').value;
-
-    let password = document.getElementById('password').value;
-
     checkEmail(email);
-    checkPassword(password);
 
     activateErrorElement(isInvalidEmail, "email-error");
+}
+
+function passwordValidation() {
+    let password = document.getElementById('password').value;
+    checkPassword(password);
+
     activateErrorElement(isInvalidPassword, "password-error");
 
-    if(!isInvalidEmail && !isInvalidPassword) {
-        $("#submit").disabled
-    }
-    
 }
 
 function activateErrorElement(flag, id) {
@@ -62,7 +87,7 @@ function validateEmail(email) {
 }
 
 function checkPassword(password) {
-    if(!password || password == "" || password.length < 6) {
+    if(!password || password == "") {
         isInvalidPassword = true;
     } else {
         isInvalidPassword = false;

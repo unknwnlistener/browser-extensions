@@ -15,13 +15,15 @@
         </div>
     </nav> -->
     <div class="main">
-        <!--<div class="text-section">
-            <h1>Heading 1</h1>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi neque harum sequi perspiciatis? Fuga omnis unde aperiam delectus natus asperiores doloremque ea, nisi optio, est assumenda, cum iusto maiores quae!</p>
+        <!-- <div class="text-section">
+            <h1>Registration successful</h1>
+            <p>You have been registered to use the tool. Enable the extension and login through it to start recording browser actions</p>
         </div> -->
+
         <div class="form-section">
             <section class="form-title">Register</section>
             <form class="form-main" id="register-form">
+                <span class="error-msg" id="login-error">Invalid login credentials entered. Try again.</span>
                 <div>
                     <label for="password">Name</label>
                     <input type="text" name="name" id="name">
@@ -29,12 +31,12 @@
                 </div>
                 <div>
                     <label for="username">Email address</label>
-                    <input type="text" name="email" id="email" onblur="checkForm()">
+                    <input type="text" name="email" id="email" onblur="emailValidation()">
                     <span class="error-msg" id="email-error">Invalid email address</span>
                 </div>
                 <div>
                     <label for="password">Password</label>
-                    <input type="password" name="password" id="password" onblur="checkForm()">
+                    <input type="password" name="password" id="password" onblur="passwordValidation()">
                     <span class="error-msg" id="password-error">Invalid password</span>
                 </div>
                 <input type="button" id="submit" class="btn" type="submit" value="Sign Up" disabled="disabled">

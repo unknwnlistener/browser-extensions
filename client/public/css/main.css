@@ -42,10 +42,14 @@ input:focus {
   align-items: center;
 }
 .main .text-section {
+  padding: 20px;
   background: white;
-  width: 45%;
+  width: 50%;
   border: 1px solid black;
   border-collapse: collapse;
+}
+.main .text-section h1 {
+  margin: 0px 0px 5px 0px;
 }
 .main .form-section {
   background: white;
@@ -96,6 +100,10 @@ input:focus {
   background-color: rgba(0, 0, 0, 0.3);
   color: rgba(0, 0, 0, 0.7);
   cursor: not-allowed;
+}
+.btn:focus {
+  background-color: #0d66d0;
+  border-color: #0d66d0;
 }
 
 /*Footer*/
