@@ -103,6 +103,7 @@ router.get('/users/:userId/actions', authController.verifyToken, actionControlle
  * @swagger
  * /users:
  *   get:
+ *     summary: List of all users
  *     security:
  *       - Bearer: []
  *     tags:
@@ -120,6 +121,7 @@ router.get('/users/:userId/actions', authController.verifyToken, actionControlle
  *     tags:
  *       - Users
  *     description: Creates a new user
+ *     deprecated: true
  *     consumes:
  *       - application/json
  *     parameters:
@@ -134,6 +136,6 @@ router.get('/users/:userId/actions', authController.verifyToken, actionControlle
  *         description: Successfully created
  */
 router.get('/users', authController.verifyToken, userController.list_all_users);
-router.post('/users', authController.verifyToken, userController.create_new_user);
+// router.post('/users', authController.verifyToken, userController.create_new_user);
 
 module.exports = router;
