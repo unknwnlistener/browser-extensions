@@ -8,8 +8,6 @@ $(document).ready(() => {
 
     readConfig();
 
-    setConfigListeners();
-
     $('#register').click(() => {
         console.log("Register button clicked");
         popupRegister();
@@ -38,10 +36,10 @@ $(document).ready(() => {
             success: (data) => {
                 if(data.status) {
                     Cookies.set("token", data.data.token);
-                }
+                }            
                 console.log("Packet receieved = ", data);
                 console.log("Cookie set : ", Cookies.get("token"));
-                chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
+                chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token'), config: config});
                 location.reload(false);
             },
             error: () => {
@@ -91,8 +89,25 @@ function popupRegister() {
 
 function readConfig() {
     console.log(config);
-
-    $(".settings").html(generateToggleRows());
+    $.ajax({
+        url: `${currentUrl}/api/config`,
+        type: "GET",
+        headers: {
+            'Authorization': `Bearer ${Cookies.get('token')}`,
+        },
+        success: (data) => {
+            if(data.status) {
+                config.actions = JSON.parse(JSON.stringify(data.data));
+            }
+            console.log("Config file received = ", data);
+            $(".settings").html(generateToggleRows());
+            setConfigListeners();
+        },
+        error: () => {
+            console.error("Could not read config");
+            $('.error-msg').css('display', 'block');
+        }
+    });
 }
 
 function generateToggleRows() {
@@ -116,6 +131,7 @@ function generateToggleRows() {
 
 // Updates the config={} object. [TODO] Send that config to server and the server will handle that config to send data
 function setConfigListeners() {
+    console.log("Setting test button values : ", JSON.stringify(config));
     $('input:checkbox').change(function(){
         if(($(this)).is(':checked')) {
             console.log("Checked config : ",$(this).attr('id'), true);

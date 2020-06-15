@@ -7,6 +7,9 @@ const common = require('../utilities/common');
 const authRepo = require('../repositories/authRepository');
 const secretValue = 'mySecret'; // [TODO] Change the location of secret to a config file
 
+let fs = require('fs');
+const path = require('path');
+
 exports.login_user = async (req, res) => {  //ToDO: wrap into a result model
     try {
         var user = await authRepo.findUserByEmail(req.body.email);
@@ -80,5 +83,16 @@ exports.verifyToken = (req, res, next) => {
 
     } else {
         return common.error_send(res, {message: "Invalid token"}, 403);
+    }
+}
+
+exports.get_config = (req, res) => {
+    // console.log("CONFIG path : ", path.join(__dirname,'../../', 'config.json'));
+    try {
+        let configJson = JSON.parse(fs.readFileSync(path.join(__dirname,'../../', 'config.json')));
+        console.log("CONFIG : ", configJson);
+        return common.result_send(res, configJson, null, 200, "Config data successfully passed"); 
+    } catch (e) {
+        return common.error_send(res, e, 404);
     }
 }

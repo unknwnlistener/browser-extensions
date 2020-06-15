@@ -22,6 +22,18 @@ const authController = require('../controllers/authController');
  *         type: string   
  *       name:
  *         type: string        
+ *   Config:
+ *     properties:
+ *       url:
+ *         type: boolean
+ *       tab_opened:
+ *         type: boolean
+ *       tab_closed:
+ *         type: boolean
+ *       mouse_click:
+ *         type: boolean
+ *       keystrokes:
+ *         type: boolean
  */
 
 /**
@@ -68,5 +80,25 @@ router.post('/login', authController.login_user);
  */
 router.post('/register', authController.register_user);
 
+
+// Config Route
+/**
+ * @swagger
+ * /config:
+ *   get:
+ *     summary: Gets the server config setting
+ *     security:
+ *       - Bearer: []
+ *     tags:
+ *       - Auth
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: JSON of config file
+ *         schema:
+ *           $ref: '#/definitions/Config'
+ */
+router.get('/config', authController.verifyToken, authController.get_config);
 
 module.exports = router;
