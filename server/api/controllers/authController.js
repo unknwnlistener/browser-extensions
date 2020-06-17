@@ -88,6 +88,7 @@ exports.verifyToken = (req, res, next) => {
 
 exports.get_config = (req, res) => {
     // console.log("CONFIG path : ", path.join(__dirname,'../../', 'config.json'));
+    console.log("GET CONFIG");
     try {
         let configJson = JSON.parse(fs.readFileSync(path.join(__dirname,'../../', 'config.json')));
         console.log("CONFIG : ", configJson);
@@ -95,4 +96,18 @@ exports.get_config = (req, res) => {
     } catch (e) {
         return common.error_send(res, e, 404);
     }
+}
+
+exports.update_config = (req, res) => {
+    let config = req.body;
+    console.log("Begin updating config");
+    try {
+        console.log("Updated config file", config.actions);
+        fs.writeFileSync(path.join(__dirname,'../../', 'config.json'), JSON.stringify(config.actions), 'utf-8');
+        return common.result_send(res, config, null);
+    } catch (e) {
+        console.log("Error", e);
+        return common.error_send(res, e, 404);
+    }
+    // return common.result_send(res, null, null);
 }

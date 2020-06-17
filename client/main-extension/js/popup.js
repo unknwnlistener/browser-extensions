@@ -103,9 +103,8 @@ function readConfig() {
             $(".settings").html(generateToggleRows());
             setConfigListeners();
         },
-        error: () => {
-            console.error("Could not read config");
-            $('.error-msg').css('display', 'block');
+        error: (e) => {
+            console.error("Could not read config", e);
         }
     });
 }
@@ -116,16 +115,16 @@ function generateToggleRows() {
     
     for (const value in config.actions) {
         if (config.actions.hasOwnProperty(value)) {
-            const element = config.actions[value];
-            console.log("Element:  %s, Value: %s", element, value);
+            const flag = config.actions[value];
             html += `
             <div class="items item-${rowCount++}">
                 <p class="item-text">${value}</p>
-                <input id="${value}" type="checkbox" class="toggle" ${element?"checked": ""}>
+                <input id="${value}" type="checkbox" class="toggle" ${flag=="true"?"checked": ""}>
             </div>`;
         }
     }
-
+    // Submit button to send the test call
+    html += `<input type="button" id="test-submit" class="btn" type="submit" value="Send" disabled>`;
     return html;
 }
 
@@ -140,5 +139,26 @@ function setConfigListeners() {
             console.log("Unchecked config : ",$(this).attr('id'), false);
             config.actions[$(this).attr('id')] = false;
         }
+        $('#test-submit').removeAttr('disabled');
+    });
+    // Update config
+    $('#test-submit').click(function() {
+        console.log("Sending new config settings");
+        $.ajax({
+            url: `${currentUrl}/api/config`,
+            type: "PUT",
+            data: config,
+            headers: {
+                'Authorization': `Bearer ${Cookies.get('token')}`,
+            },
+            success: (data) => {
+                console.log("Config updated ", data);
+                chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token'), config: config});
+                location.reload(false);
+            },
+            error: (e) => {
+                console.error("Could not update config", e);
+            }
+        });
     });
 }

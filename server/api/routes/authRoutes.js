@@ -90,7 +90,20 @@ router.post('/register', authController.register_user);
  *     security:
  *       - Bearer: []
  *     tags:
- *       - Auth
+ *       - Config
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: JSON of config file
+ *         schema:
+ *           $ref: '#/definitions/Config'
+ *   put:
+ *     summary: Updates the server config setting
+ *     security:
+ *       - Bearer: []
+ *     tags:
+ *       - Config
  *     produces:
  *       - application/json
  *     responses:
@@ -100,5 +113,6 @@ router.post('/register', authController.register_user);
  *           $ref: '#/definitions/Config'
  */
 router.get('/config', authController.verifyToken, authController.get_config);
+router.put('/config', authController.verifyToken, authController.update_config);
 
 module.exports = router;
