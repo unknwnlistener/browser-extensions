@@ -36,7 +36,7 @@ $(document).ready(() => {
             success: (data) => {
                 if(data.status) {
                     Cookies.set("token", data.data.token);
-                }            
+                }
                 console.log("Packet receieved = ", data);
                 console.log("Cookie set : ", Cookies.get("token"));
                 chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token'), config: config});
@@ -101,6 +101,7 @@ function readConfig() {
             }
             console.log("Config file received = ", data);
             $(".settings").html(generateToggleRows());
+            Cookies.set('config', config);
             setConfigListeners();
         },
         error: (e) => {
@@ -153,6 +154,7 @@ function setConfigListeners() {
             },
             success: (data) => {
                 console.log("Config updated ", data);
+                Cookies.set('config', config);
                 chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token'), config: config});
                 location.reload(false);
             },

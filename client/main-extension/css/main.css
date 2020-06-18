@@ -146,7 +146,7 @@ input[type="checkbox"]:focus {
   position: relative;
   margin: 0;
   border: 2px solid #474755;
-  background: linear-gradient(180deg, #ffffff 0%, #fffccc 100%);
+  background: #ffffff;
   transition: all 0.2s ease;
 }
 .toggle:after {
@@ -166,5 +166,5 @@ input[type="checkbox"]:focus {
 }
 .toggle:checked:after {
   background: #654FEC;
-  transform: translatex(13px);
+  transform: translatex(14px);
 }
