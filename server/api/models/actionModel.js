@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var idValidator = require('mongoose-id-validator');
 var Schema = mongoose.Schema;
 
-const actionTypes = Object.freeze({'url':'url','mouse':'mouse','key':'key','tabOpen':'tab_opened','tabClose':'tab_closed','tabSwitch':'tab_switch'});
+const actionTypes = Object.freeze({'url':'url','mouse':'mouse_click','key':'key','tabOpen':'tab_opened','tabClose':'tab_closed','tabSwitch':'tab_switch'});
 
 var ActionSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'Users', required: [true, 'User is required'] },

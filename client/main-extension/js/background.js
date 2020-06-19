@@ -5,6 +5,7 @@ const currentUrl = 'http://localhost:3000';
     a. New url entered
     b. New tab opened
     c. Tab closed
+    d. Mouse click location in page (excluding screenshot for now)
 
 2. POST the action to the server
 
@@ -12,6 +13,7 @@ const currentUrl = 'http://localhost:3000';
 var currentWindowId;
 var currentToken = Cookies.get('token');
 var currentConfig = JSON.parse(Cookies.get('config'));
+var mouseClickActiveTab;
 
 let isSetListeners = false;
 
@@ -30,13 +32,27 @@ $(document).ready(() => {
     
     // Listener for cookies
     chrome.runtime.onMessage.addListener((request, sender) => {
-        if(request.source === "popup") {
-            currentToken = Cookies.get('token');
-            currentConfig = JSON.parse(JSON.stringify(request.config));
-            console.log("[BACKGROUND][COOKIES] : ",request, Cookies.get('token'), currentConfig);
-        }
+        currentToken = Cookies.get('token');
         if(currentToken) {
-            addTabListeners();
+            if(request.source === "popup") {
+                currentConfig = JSON.parse(JSON.stringify(request.config));
+                console.log("[BACKGROUND][COOKIES] : ",request, Cookies.get('token'), currentConfig);
+                addTabListeners();
+            } else if(request.source === "target") {
+                let mouseEvent = request.mouse;
+                console.log("[MESSAGE SEND] Mouse event sent", request);
+                
+                dataObj = {
+                    action: 'mouse_click',
+                    tabId: mouseClickActiveTab.tabId,
+                    url: mouseClickActiveTab.url,
+                    windowId: mouseClickActiveTab.windowId,
+                    mouse_x: mouseEvent.pageX,
+                    mouse_y: mouseEvent.pageY
+                }
+                // console.log("[REST] Sending mouse click data", dataObj);
+                actionPostApi(currentToken, dataObj);
+            }
         } else {
             console.log("[BACKGROUND] Removed listener for Tabs");
             chrome.tabs.onUpdated.removeListener(tabUpdates);
@@ -49,7 +65,7 @@ $(document).ready(() => {
 
 function actionPostApi(currentToken, dataObj) {
     dataObj['client_timestamp'] = Date.now();
-    let isValidAction = currentConfig.actions[dataObj['action']];
+    let isValidAction = currentConfig.actions[dataObj['action']].toString();
     console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action']);
     if(isValidAction && (isValidAction == "true")) {
         $.ajax({
@@ -87,21 +103,20 @@ function addTabListeners() {
                         windowId: currentWindowId
                     }
                     actionPostApi(currentToken, dataObj);
-                } else { // Url updated
+                } else if(activeTab.url && (activeTab.url.startsWith('https://') || activeTab.url.startsWith('http://'))) {
                     // Info to store -- url, tabId, windowId
-                    // console.log("TabId : ",tabId);
-                    // console.log("Change Info: ",changeInfo);
-                    // console.log("Active Tab : ", activeTab);
                     dataObj = {
                         action: 'url',
                         tabId: tabId,
                         url: activeTab.url,
                         windowId: currentWindowId
                     }
+                    addMouseEventListeners(tabId, currentWindowId, activeTab.url);
                     actionPostApi(currentToken, dataObj);
                 }
             }
         });
+        // Tab closing
         chrome.tabs.onRemoved.addListener(tabRemoved = (tabId, removeInfo) => {
             dataObj = {
                 action: 'tab_closed',
@@ -110,5 +125,38 @@ function addTabListeners() {
             }
             actionPostApi(currentToken, dataObj);
         });
+
     }
+}
+
+function addMouseEventListeners(tabId, windowId, url) {
+    // Mouseclick actions
+    mouseClickActiveTab = { tabId: tabId, windowId: windowId, url: url };
+    // IDEA: Instead of listenening to every active tab being highlighted, what if listeners were added to every new URL. This way even if the user is on the same tab and continues surfing, mouseclick listeners will always be present.
+    // Mouseclick event gets reset when a new url is navigated to in the same tab
+/*    // List of tabs already listened to
+    let listenedTabs = [];
+    chrome.tabs.onActivated.addListener((activeInfo) => {
+        console.log("Adding more listeners?");
+        mouseClickActiveTab = {
+            action: 'mouse_click',
+            tabId: activeInfo.tabId,
+            windowId: activeInfo.windowId
+        }
+        if(!listenedTabs.includes(activeInfo.tabId)) {
+            listenedTabs.push(activeInfo.tabId);
+            chrome.tabs.get(activeInfo.tabId, (tab) => {
+                if(tab.url && (tab.url.startsWith('https://') || tab.url.startsWith('http://'))) {
+                    chrome.tabs.executeScript(activeInfo.tabId, {file: './js/pageEventListeners.js'}, () => {
+                        console.log("[CALLBACK] Injected script in other page");
+                    });
+                }
+            });
+        }
+    });
+    */
+    // TEST -- Change urls on the same page and see how many listeners get added
+    chrome.tabs.executeScript(tabId, {file: './js/pageEventListeners.js'}, () => {
+        console.log("[CALLBACK] Injected script in other page");
+    });
 }
