@@ -13,7 +13,7 @@ const currentUrl = 'http://localhost:3000';
 var currentWindowId;
 var currentToken = Cookies.get('token');
 var currentConfig = JSON.parse(Cookies.get('config'));
-var mouseClickActiveTab;
+var deviceClickActiveTab;
 
 let isSetListeners = false;
 
@@ -21,7 +21,6 @@ $(document).ready(() => {
     console.log("[BACKGROUND] Loaded page", Cookies.get('token'), Cookies.get('config'));
     
     chrome.windows.getCurrent((activeWindow) => {
-        console.log(activeWindow);
         currentWindowId = activeWindow.id;
     });
 
@@ -44,13 +43,24 @@ $(document).ready(() => {
                 
                 dataObj = {
                     action: 'mouse_click',
-                    tabId: mouseClickActiveTab.tabId,
-                    url: mouseClickActiveTab.url,
-                    windowId: mouseClickActiveTab.windowId,
+                    tabId: deviceClickActiveTab.tabId,
+                    url: deviceClickActiveTab.url,
+                    windowId: deviceClickActiveTab.windowId,
                     mouse_x: mouseEvent.pageX,
                     mouse_y: mouseEvent.pageY
                 }
                 // console.log("[REST] Sending mouse click data", dataObj);
+                actionPostApi(currentToken, dataObj);
+            } else if (request.source === "keyboard") {
+                console.log("Keyboard event recorded ", request.data);
+                let keyEvent = request.data;
+                dataObj = {
+                    action: 'keystrokes',
+                    tabId: deviceClickActiveTab.tabId,
+                    url: deviceClickActiveTab.url,
+                    windowId: deviceClickActiveTab.windowId,
+                    keys: keyEvent.join()
+                }
                 actionPostApi(currentToken, dataObj);
             }
         } else {
@@ -95,43 +105,47 @@ function addTabListeners() {
         console.log("[BACKGROUND] Adding listener for tabs");
         isSetListeners = true;
         chrome.tabs.onUpdated.addListener(tabUpdates = (tabId, changeInfo, activeTab) => {
-            if(changeInfo.status === "complete" && activeTab.windowId == currentWindowId) {
-                if(activeTab.url == "chrome://newtab/") { // New tab -- Specific to Brave browser?
-                    dataObj = {
-                        action: 'tab_opened',
-                        tabId: tabId,
-                        windowId: currentWindowId
+            if(activeTab.windowId == currentWindowId) {
+                if(changeInfo.status === "complete") {
+                    if(activeTab.url == "chrome://newtab/") { // New tab -- Specific to Brave browser?
+                        dataObj = {
+                            action: 'tab_opened',
+                            tabId: tabId,
+                            windowId: currentWindowId
+                        }
+                        actionPostApi(currentToken, dataObj);
+                    } else if(activeTab.url && (activeTab.url.startsWith('https://') || activeTab.url.startsWith('http://'))) {
+                        // Info to store -- url, tabId, windowId
+                        dataObj = {
+                            action: 'url',
+                            tabId: tabId,
+                            url: activeTab.url,
+                            windowId: currentWindowId
+                        }
+                        addDeviceEventListeners(tabId, currentWindowId, activeTab.url);
+                        actionPostApi(currentToken, dataObj);
                     }
-                    actionPostApi(currentToken, dataObj);
-                } else if(activeTab.url && (activeTab.url.startsWith('https://') || activeTab.url.startsWith('http://'))) {
-                    // Info to store -- url, tabId, windowId
-                    dataObj = {
-                        action: 'url',
-                        tabId: tabId,
-                        url: activeTab.url,
-                        windowId: currentWindowId
-                    }
-                    addMouseEventListeners(tabId, currentWindowId, activeTab.url);
-                    actionPostApi(currentToken, dataObj);
                 }
             }
         });
         // Tab closing
         chrome.tabs.onRemoved.addListener(tabRemoved = (tabId, removeInfo) => {
-            dataObj = {
-                action: 'tab_closed',
-                tabId: tabId,
-                windowId: currentWindowId
+            if(removeInfo.windowId == currentWindowId) {
+                dataObj = {
+                    action: 'tab_closed',
+                    tabId: tabId,
+                    windowId: currentWindowId
+                }
+                actionPostApi(currentToken, dataObj);
             }
-            actionPostApi(currentToken, dataObj);
         });
 
     }
 }
 
-function addMouseEventListeners(tabId, windowId, url) {
+function addDeviceEventListeners(tabId, windowId, url) {
     // Mouseclick actions
-    mouseClickActiveTab = { tabId: tabId, windowId: windowId, url: url };
+    deviceClickActiveTab = { tabId: tabId, windowId: windowId, url: url };
     // IDEA: Instead of listenening to every active tab being highlighted, what if listeners were added to every new URL. This way even if the user is on the same tab and continues surfing, mouseclick listeners will always be present.
     // Mouseclick event gets reset when a new url is navigated to in the same tab
 /*    // List of tabs already listened to
