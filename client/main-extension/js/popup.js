@@ -1,6 +1,9 @@
 // Passing data through REST APIs to Node server
 const currentUrl = 'http://localhost:3000';
 // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWRhMTc2ZmMwMjA3YzQxMDBlM2JiYTkiLCJpYXQiOjE1OTEzNTExNTF9.-HonhXPYV2S0DUyNNStY9qeGqWCW5M_IkNlrlmrx3bs';
+
+let config = {};
+
 $(document).ready(() => {
     if(Cookies.get('token')) {
         $('.main').replaceWith(loggedInMessageHtml());
@@ -39,6 +42,7 @@ $(document).ready(() => {
                 }
                 console.log("Packet receieved = ", data);
                 console.log("Cookie set : ", Cookies.get("token"));
+                readConfig();
                 chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token'), config: config});
                 location.reload(false);
             },
@@ -88,7 +92,6 @@ function popupRegister() {
 }
 
 function readConfig() {
-    console.log(config);
     $.ajax({
         url: `${currentUrl}/api/config`,
         type: "GET",
@@ -105,7 +108,10 @@ function readConfig() {
             setConfigListeners();
         },
         error: (e) => {
-            console.error("Could not read config", e);
+            if(e.status != 403)
+                console.error("Could not read config", e);
+            else
+                console.log("Forbidden", e);
         }
     });
 }

@@ -15,11 +15,10 @@
     },  
     "version": "1.0.0",
     "permissions": [
+        "activeTab",
         "tabs",
         "cookies",
-        "activeTab",
-        "storage",
-        "https://*/*",
+        "<all_urls>",
         "http://localhost:3000/*"
     ]
 }

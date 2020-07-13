@@ -27,6 +27,7 @@ Follow these steps to start node server:
 ###### MongoDB
 - https://university.mongodb.com/courses/M001/about?offering_id=M001%2F2019_December_10
 - https://ciphertrick.com/connecting-mongodb-nodejs/
+- Storing Images: https://docs.mongodb.com/manual/reference/limits/#BSON%20Document%20Size
 
 ###### Mongoose
 - https://code.tutsplus.com/articles/an-introduction-to-mongoose-for-mongodb-and-nodejs--cms-29527
@@ -51,3 +52,6 @@ Follow these steps to start node server:
 
 ###### REST APIs
 - Best Practices - https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api
+
+###### Chrome extension
+- Desktop Capture: https://developer.chrome.com/extensions/desktopCapture
