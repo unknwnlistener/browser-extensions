@@ -13,11 +13,6 @@ function ready(fn) {
 }
 
 ready(() => {
-    let currentConfig;
-    chrome.storage.sync.get('config', (config) => {
-        currentConfig = JSON.parse(config);
-    });
-    console.log("[DEBUG] CONFIG", currentConfig);
     try {
         globalBuffer = [];
         const options = {
