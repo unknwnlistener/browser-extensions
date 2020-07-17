@@ -15,7 +15,7 @@ const currentUrl = 'http://localhost:3000';
 var currentWindowId;
 var currentToken = Cookies.get('token');
 let configCookie = Cookies.get('config');
-var currentConfig = configCookie ? JSON.parse(configCookie) : configCookie;
+// var currentConfig = configCookie ? JSON.parse(configCookie) : configCookie;
 var deviceClickActiveTab;
 
 let isSetListeners = false;
@@ -37,7 +37,7 @@ $(document).ready(() => {
         currentToken = Cookies.get('token');
         if(currentToken) {
             if(request.source === "popup") {
-                currentConfig = JSON.parse(Cookies.get('config'));
+                let currentConfig = JSON.parse(Cookies.get('config'));
                 console.log("[BACKGROUND][COOKIES] : ",request, Cookies.get('token'), currentConfig);
                 addTabListeners();
             } else if(request.source === "target") {
@@ -79,8 +79,8 @@ $(document).ready(() => {
 function actionPostApi(currentToken, dataObj) {
     dataObj['client_timestamp'] = Date.now();
     let isValidAction = checkEnabledAction(dataObj['action']);
-    console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action']);
     if(isValidAction && (isValidAction === "true")) {
+        console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action']);
         $.ajax({
             url: `${currentUrl}/api/users/actions`,
             type: "POST",
@@ -101,6 +101,7 @@ function actionPostApi(currentToken, dataObj) {
 }
 
 function checkEnabledAction(action) {
+    let currentConfig = JSON.parse(Cookies.get('config'));
     console.log("[DEBUG] currentConfig & action", currentConfig, action);
     return currentConfig && (currentConfig.hasOwnProperty("actions") && currentConfig.actions.hasOwnProperty(action) ? currentConfig.actions[action].toString(): "false");
 }
