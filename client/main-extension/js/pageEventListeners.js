@@ -24,14 +24,15 @@ ready(() => {
         document.addEventListener('click', handleMouseClick);
         keyMapper(options);
 
-        // Logic: Every 3 seconds check if the last key time (global) was longer than the delay time ago. If it was than send what is in the buffer and reset it
+        // Logic: Every second check if the last key time (global) was longer than the delay time ago. If it was than send what is in the buffer and reset it
         window.setInterval(() => {
             if(globalBuffer && globalBuffer.length != 0 && (Date.now() - globalLastKeyTime > options.keystrokeDelay)) {
                 console.log("Buffer check active", globalBuffer, Date.now());
+                sendBufferData();
                 // chrome.runtime.sendMessage({source: 'keyboard', data: local.buffer})
                 globalBuffer = [];
             }
-        }, 1000); // 3 seconds
+        }, 1000); // 1 seconds
     }catch(e) {
         console.log("Cannot remove", e);
     }
@@ -66,8 +67,11 @@ function handleKeyboardInput(event, keystrokeDelay) {
     try {
         // chrome.runtime.sendMessage({source: 'keyboard', keys: {keys: "abcde"}});
         // letters, numbers and spaces individually
+        if(event.keyCode === 13) { //Return key
+            sendBufferData();
+        }
+        
         if(!(/^[\w\d\s]$/g.test(key))) return; // Guard
-
         // globalBuffer = [];
         const currentTime =  Date.now();
         if(currentTime - scope.lastKeyTime > keystrokeDelay) {
@@ -86,6 +90,7 @@ function handleKeyboardInput(event, keystrokeDelay) {
 
 function sendBufferData() {
     if(globalBuffer && globalBuffer.length != 0) {
+        console.log("Sending buffer to main", globalBuffer);
         chrome.runtime.sendMessage({source: 'keyboard', data: globalBuffer})
         globalBuffer = [];
     }
