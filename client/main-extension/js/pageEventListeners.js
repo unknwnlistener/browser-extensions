@@ -24,13 +24,13 @@ ready(() => {
         document.addEventListener('click', handleMouseClick);
         keyMapper(options);
 
+        const delay = hasProperty('keystrokeDelay', options) && options.keystrokeDelay >= 300 && options.keystrokeDelay;
+        const keystrokeDelay = delay || 1000;
         // Logic: Every second check if the last key time (global) was longer than the delay time ago. If it was than send what is in the buffer and reset it
         window.setInterval(() => {
-            if(globalBuffer && globalBuffer.length != 0 && (Date.now() - globalLastKeyTime > options.keystrokeDelay)) {
+            if(globalBuffer && globalBuffer.length != 0 && (Date.now() - globalLastKeyTime > keystrokeDelay)) {
                 console.log("Buffer check active", globalBuffer, Date.now());
                 sendBufferData();
-                // chrome.runtime.sendMessage({source: 'keyboard', data: local.buffer})
-                globalBuffer = [];
             }
         }, 1000); // 1 seconds
     }catch(e) {
@@ -53,36 +53,30 @@ function keyMapper(options) {
     const delay = hasProperty('keystrokeDelay', options) && options.keystrokeDelay >= 300 && options.keystrokeDelay;
     const keystrokeDelay = delay || 1000;
     const eventType = hasProperty('eventType', options) && options.eventType || 'keydown';
-
-    document.addEventListener(eventType, (event) => handleKeyboardInput(event, keystrokeDelay) );   
+    document.removeEventListener(eventType, handleKeyboardInput)
+    document.addEventListener(eventType, handleKeyboardInput);   
 }
 
-function handleKeyboardInput(event, keystrokeDelay) {
-    let scope = {
-        buffer: [],
-        lastKeyTime: Date.now()
-    }
+function handleKeyboardInput(event) {
+    // let scope = {
+    //     buffer: [],
+    //     lastKeyTime: Date.now()
+    // }
     
     const key = event.key;
     try {
         // chrome.runtime.sendMessage({source: 'keyboard', keys: {keys: "abcde"}});
         // letters, numbers and spaces individually
-        if(event.keyCode === 13) { //Return key
+        if(event.keyCode === 13) { // Return/Enter key
             sendBufferData();
         }
         
         if(!(/^[\w\d\s]$/g.test(key))) return; // Guard
-        // globalBuffer = [];
         const currentTime =  Date.now();
-        if(currentTime - scope.lastKeyTime > keystrokeDelay) {
-            scope.buffer = [key];
-        } else {
-            scope.buffer = [...globalBuffer, key];
-        }
-        globalBuffer = scope.buffer;
-        scope.lastKeyTime = currentTime;
+        globalBuffer = [...globalBuffer, key];
+        console.log("[DEBUG] Update global Buffer", globalBuffer);
         globalLastKeyTime = currentTime;
-        // scope = {buffer: globalBuffer, lastKeyTime: currentTime};
+
     } catch(e) {
         console.log("Chrome V keyboard problems");
     }
