@@ -78,9 +78,9 @@ $(document).ready(() => {
 
 function actionPostApi(currentToken, dataObj) {
     dataObj['client_timestamp'] = Date.now();
-    let isValidAction = currentConfig && currentConfig.hasOwnProperty(dataObj['action']) ? currentConfig.actions[dataObj['action']].toString(): "false";
+    let isValidAction = checkEnabledAction(dataObj['action']);
     console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action']);
-    if(isValidAction && (isValidAction == "true")) {
+    if(isValidAction && (isValidAction === "true")) {
         $.ajax({
             url: `${currentUrl}/api/users/actions`,
             type: "POST",
@@ -98,6 +98,10 @@ function actionPostApi(currentToken, dataObj) {
     } else {
         console.log("[CONFIG] NOT RECORDING ACTION %s", dataObj['action']);
     }
+}
+
+function checkEnabledAction(action) {
+    return currentConfig && currentConfig.hasOwnProperty(action) ? currentConfig.actions[action].toString(): "false";
 }
 
 
@@ -119,6 +123,7 @@ function addTabListeners() {
                         actionPostApi(currentToken, dataObj);
                     } else if(activeTab.url && (activeTab.url.startsWith('https://') || activeTab.url.startsWith('http://'))) {
                         // Info to store -- url, tabId, windowId
+                        console.log("%c[DEBUG]...Recording new URL....", "color: blue; font-size: 14px;");
                         let dataObj = {
                             action: 'url',
                             tabId: tabId,
@@ -126,9 +131,9 @@ function addTabListeners() {
                             windowId: currentWindowId
                         }
                         addDeviceEventListeners(tabId, currentWindowId, activeTab.url);
-                        capturePageScreenshot(tabId, currentWindowId, activeTab.url);
                         console.log("[DEBUG]: ", JSON.parse(JSON.stringify(dataObj)));
                         actionPostApi(currentToken, dataObj);
+                        capturePageScreenshot(tabId, currentWindowId, activeTab.url);
                     }
                 }
             }
@@ -166,13 +171,14 @@ function capturePageScreenshot(tabId, windowId, url) {
     //     windowId: windowId,
     //     url: url
     // }
-    let blob;
-    chrome.browserAction.onClicked.addListener((tab)=> console.log("[DEBUG] TABSSS", tab));
+    let imageFormat = 'jpeg';
+    // chrome.browserAction.onClicked.addListener((tab)=> console.log("[DEBUG] TABSSS", tab));
     console.log("[DEBUG] Capturing Screenshot...");
-    chrome.tabs.captureVisibleTab(windowId, {format: 'jpeg'}, (image) => {
+    chrome.tabs.captureVisibleTab(windowId, {format: imageFormat}, (image) => {
         // console.log("Capturing screenshot", image);
-        if(image) saveImage(image, 'jpeg');
+        if(image) saveImage(image, imageFormat);
     });
+    // window.scrollTo(0,200);
 
 }
 
