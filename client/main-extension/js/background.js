@@ -79,7 +79,7 @@ $(document).ready(() => {
 function actionPostApi(currentToken, dataObj) {
     dataObj['client_timestamp'] = Date.now();
     let isValidAction = checkEnabledAction(dataObj['action']);
-    if(isValidAction && (isValidAction === "true")) {
+    if(isValidAction) {
         console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action']);
         $.ajax({
             url: `${currentUrl}/api/users/actions`,
@@ -103,16 +103,19 @@ function actionPostApi(currentToken, dataObj) {
 function checkEnabledAction(action) {
     let currentConfig = JSON.parse(Cookies.get('config'));
     console.log("[DEBUG] currentConfig & action", currentConfig, action);
-    return currentConfig && (currentConfig.hasOwnProperty("actions") && currentConfig.actions.hasOwnProperty(action) ? currentConfig.actions[action].toString(): "false");
+    return currentConfig && (currentConfig.hasOwnProperty("actions") && currentConfig.actions.hasOwnProperty(action) ? currentConfig.actions[action].toString() === "true": false);
 }
 
 
 function addTabListeners() {
     // Filtering out tab values not in the active window
-    // Named callback for the event listener so it can be removed later
+    // Named callback for the event listener so that the listener can be removed later
+    console.log()
     if(!isSetListeners) {
         console.log("[BACKGROUND] Adding listener for tabs");
         isSetListeners = true;
+        // Guard for listener based on config
+        // if(checkEnabledAction('url') || checkEnabledAction('tab_opened')) {
         chrome.tabs.onUpdated.addListener(tabUpdates = (tabId, changeInfo, activeTab) => {
             if(activeTab.windowId == currentWindowId) {
                 if(changeInfo.status === "complete") {
@@ -140,7 +143,10 @@ function addTabListeners() {
                 }
             }
         });
+        // }
         // Tab closing
+        // Guard for listener based on config
+        // if(checkEnabledAction('tab_closed')) {
         chrome.tabs.onRemoved.addListener(tabRemoved = (tabId, removeInfo) => {
             if(removeInfo.windowId == currentWindowId) {
                 let dataObj = {
@@ -151,6 +157,7 @@ function addTabListeners() {
                 actionPostApi(currentToken, dataObj);
             }
         });
+        // }
 
     }
 }
