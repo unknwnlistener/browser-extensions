@@ -43,11 +43,11 @@ $(document).ready(() => {
                 console.log("Packet receieved = ", data);
                 console.log("Cookie set : ", Cookies.get("token"));
                 readConfig();
-                chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token'), config: config});
+                chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
                 location.reload(false);
             },
             error: () => {
-                console.error("Could not log in");
+                console.log("Invalid credentials entered", "color: red");
                 $('.error-msg').css('display', 'block');
             }
         });
@@ -133,7 +133,7 @@ function generateToggleRows() {
         }
     }
     // Submit button to send the test call
-    html += `<input type="button" id="test-submit" class="btn" type="submit" value="Send" disabled>`;
+    html += `<input type="button" id="test-submit" class="btn" type="submit" value="Save changes" disabled>`;
     return html;
 }
 
@@ -161,9 +161,11 @@ function setConfigListeners() {
                 'Authorization': `Bearer ${Cookies.get('token')}`,
             },
             success: (data) => {
-                console.log("Config updated ", data);
+                if(data.status) {
+                    config.actions = JSON.parse(JSON.stringify(data.data));
+                }
                 Cookies.set('config', config);
-                chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token'), config: config});
+                chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
                 location.reload(false);
             },
             error: (e) => {

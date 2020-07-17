@@ -14,7 +14,7 @@ const currentUrl = 'http://localhost:3000';
 */
 var currentWindowId;
 var currentToken = Cookies.get('token');
-let configCookie = Cookies.get('config')
+let configCookie = Cookies.get('config');
 var currentConfig = configCookie ? JSON.parse(configCookie) : configCookie;
 var deviceClickActiveTab;
 
@@ -37,7 +37,7 @@ $(document).ready(() => {
         currentToken = Cookies.get('token');
         if(currentToken) {
             if(request.source === "popup") {
-                currentConfig = JSON.parse(JSON.stringify(request.config));
+                currentConfig = JSON.parse(Cookies.get('config'));
                 console.log("[BACKGROUND][COOKIES] : ",request, Cookies.get('token'), currentConfig);
                 addTabListeners();
             } else if(request.source === "target") {
@@ -101,7 +101,8 @@ function actionPostApi(currentToken, dataObj) {
 }
 
 function checkEnabledAction(action) {
-    return currentConfig && currentConfig.hasOwnProperty(action) ? currentConfig.actions[action].toString(): "false";
+    console.log("[DEBUG] currentConfig & action", currentConfig, action);
+    return currentConfig && (currentConfig.hasOwnProperty("actions") && currentConfig.actions.hasOwnProperty(action) ? currentConfig.actions[action].toString(): "false");
 }
 
 
@@ -131,9 +132,9 @@ function addTabListeners() {
                             windowId: currentWindowId
                         }
                         addDeviceEventListeners(tabId, currentWindowId, activeTab.url);
-                        console.log("[DEBUG]: ", JSON.parse(JSON.stringify(dataObj)));
                         actionPostApi(currentToken, dataObj);
-                        capturePageScreenshot(tabId, currentWindowId, activeTab.url);
+                        //[TODO] Temporarily disabled
+                        // capturePageScreenshot(tabId, currentWindowId, activeTab.url);
                     }
                 }
             }

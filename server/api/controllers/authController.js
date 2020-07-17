@@ -101,9 +101,9 @@ exports.update_config = (req, res) => {
     let config = req.body;
     console.log("Begin updating config");
     try {
-        console.log("Updated config file", config.actions);
+        console.log("Updated config file", config);
         fs.writeFileSync(path.join(__dirname,'../../', 'config.json'), JSON.stringify(config.actions), 'utf-8');
-        return common.result_send(res, config, null);
+        return common.result_send(res, config.actions, null);
     } catch (e) {
         console.log("Error", e);
         return common.error_send(res, e, 404);
