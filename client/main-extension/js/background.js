@@ -14,7 +14,7 @@ const currentUrl = 'http://localhost:3000';
 */
 var currentWindowId;
 var currentToken = Cookies.get('token');
-let configCookie = Cookies.get('config');
+// let configCookie = Cookies.get('config');
 // var currentConfig = configCookie ? JSON.parse(configCookie) : configCookie;
 var deviceClickActiveTab;
 
@@ -103,7 +103,7 @@ function actionPostApi(currentToken, dataObj) {
 function checkEnabledAction(action) {
     let currentConfig = JSON.parse(Cookies.get('config'));
     console.log("[DEBUG] currentConfig & action", currentConfig, action);
-    return currentConfig && (currentConfig.hasOwnProperty("actions") && currentConfig.actions.hasOwnProperty(action) ? currentConfig.actions[action].toString() === "true": false);
+    return currentConfig && (currentConfig.hasOwnProperty("actions") && currentConfig.actions.hasOwnProperty(action) && currentConfig.actions[action].hasOwnProperty("active") ? currentConfig.actions[action]["active"].toString() === "true": false);
 }
 
 

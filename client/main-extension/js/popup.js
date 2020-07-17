@@ -124,7 +124,7 @@ function generateToggleRows() {
     
     for (const value in config.actions) {
         if (config.actions.hasOwnProperty(value)) {
-            const flag = config.actions[value];
+            const flag = config.actions[value]["active"];
             html += `
             <div class="items item-${rowCount++}">
                 <p class="item-text">${value}</p>
@@ -143,10 +143,10 @@ function setConfigListeners() {
     $('input:checkbox').change(function(){
         if(($(this)).is(':checked')) {
             console.log("Checked config : ",$(this).attr('id'), true);
-            config.actions[$(this).attr('id')] = true;
+            config.actions[$(this).attr('id')]["active"] = true;
         } else {
             console.log("Unchecked config : ",$(this).attr('id'), false);
-            config.actions[$(this).attr('id')] = false;
+            config.actions[$(this).attr('id')]["active"] = false;
         }
         $('#test-submit').removeAttr('disabled');
     });
