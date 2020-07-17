@@ -2,8 +2,6 @@
 
 var globalBuffer = [];
 var globalLastKeyTime = Date.now();
-var intervId;
-
 
 // JQUERY $(document).ready(() =>{})
 function ready(fn) {
@@ -34,7 +32,7 @@ ready(() => {
             }
         }, 1000); // 1 seconds
     }catch(e) {
-        console.log("Cannot remove", e);
+        console.log("Cannot remove event listener", e);
     }
 });
 
@@ -57,15 +55,9 @@ function keyMapper(options) {
     document.addEventListener(eventType, handleKeyboardInput);   
 }
 
-function handleKeyboardInput(event) {
-    // let scope = {
-    //     buffer: [],
-    //     lastKeyTime: Date.now()
-    // }
-    
+function handleKeyboardInput(event) {    
     const key = event.key;
     try {
-        // chrome.runtime.sendMessage({source: 'keyboard', keys: {keys: "abcde"}});
         // letters, numbers and spaces individually
         if(event.keyCode === 13) { // Return/Enter key
             sendBufferData();
@@ -74,7 +66,6 @@ function handleKeyboardInput(event) {
         if(!(/^[\w\d\s]$/g.test(key))) return; // Guard
         const currentTime =  Date.now();
         globalBuffer = [...globalBuffer, key];
-        console.log("[DEBUG] Update global Buffer", globalBuffer);
         globalLastKeyTime = currentTime;
 
     } catch(e) {
@@ -93,5 +84,3 @@ function sendBufferData() {
 function hasProperty(property, object) {
     return object && object.hasOwnProperty(property);
 }
-
-// Handle page change send whatever is in buffer
