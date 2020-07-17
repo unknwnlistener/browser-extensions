@@ -108,6 +108,7 @@ label {
   overflow: auto;
   height: 147px;
   border: 2px dashed black;
+  display: none;
 }
 
 .test-title {

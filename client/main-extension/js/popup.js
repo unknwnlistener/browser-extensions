@@ -103,11 +103,13 @@ function readConfig() {
                 config.actions = JSON.parse(JSON.stringify(data.data));
             }
             console.log("Config file received = ", data);
+            $(".test-mode").css("display", "block");
             $(".settings").html(generateToggleRows());
             Cookies.set('config', config);
             setConfigListeners();
         },
         error: (e) => {
+            $(".test-mode").css("display", "none");
             if(e.status != 403)
                 console.error("Could not read config", e);
             else
