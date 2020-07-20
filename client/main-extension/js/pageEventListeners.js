@@ -2,6 +2,7 @@
 
 var globalBuffer = [];
 var globalLastKeyTime = Date.now();
+var listener;
 
 // JQUERY $(document).ready(() =>{})
 function ready(fn) {
@@ -54,21 +55,39 @@ function keyMapper(options) {
     const eventType = hasProperty('eventType', options) && options.eventType || 'keydown';
     document.removeEventListener(eventType, handleKeyboardInput)
     document.addEventListener(eventType, handleKeyboardInput);   
+
+    // keyboardJS.bind('', (e) => {
+    //     console.log(e.key, "key was pressed");
+    // });
 }
 
-function handleKeyboardInput(event) {    
-    const key = event.key;
+function handleKeyboardInput(event) {
+    let key = event.key;
     try {
-        // letters, numbers and spaces individually
-        if(event.keyCode === 13) { // Return/Enter key
-            sendBufferData();
+        switch(event.key) {
+            case "Control":
+                key = "Ctrl";
+                break;
+            case "Meta":
+                key = "Command";
+                break;
+            case " ":
+                key = "Space";
+                break;
+            // case "Enter":
+            // case "Alt":
+            // case "AltGraph":
+            // case "Shift":
+            // case "CapsLock":
+            // case "Tab":
         }
         
-        if(!(/^[\w\d\s]$/g.test(key))) return; // Guard
         const currentTime =  Date.now();
         globalBuffer = [...globalBuffer, key];
         globalLastKeyTime = currentTime;
-
+        if(event.keyCode === 13) { // Return/Enter key
+            sendBufferData();
+        }
     } catch(e) {
         console.log("Chrome V keyboard problems");
     }

