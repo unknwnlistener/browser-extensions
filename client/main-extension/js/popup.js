@@ -3,6 +3,7 @@ const currentUrl = 'http://localhost:3000';
 // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWRhMTc2ZmMwMjA3YzQxMDBlM2JiYTkiLCJpYXQiOjE1OTEzNTExNTF9.-HonhXPYV2S0DUyNNStY9qeGqWCW5M_IkNlrlmrx3bs';
 
 let config = {};
+const cookieExpireDays = 1; //Number value representing number of days cookie will be active.
 
 $(document).ready(() => {
     if(Cookies.get('token')) {
@@ -38,7 +39,7 @@ $(document).ready(() => {
             data: $('#login-form').serialize(),
             success: (data) => {
                 if(data.status) {
-                    Cookies.set("token", data.data.token);
+                    Cookies.set("token", data.data.token, {expires: cookieExpireDays});
                 }
                 console.log("Packet receieved = ", data);
                 console.log("Cookie set : ", Cookies.get("token"));
@@ -105,7 +106,7 @@ function readConfig() {
             console.log("Config file received = ", data);
             $(".test-mode").css("display", "block");
             $(".settings").html(generateToggleRows());
-            Cookies.set('config', config);
+            Cookies.set('config', config, {expires: cookieExpireDays});
             setConfigListeners();
         },
         error: (e) => {
@@ -164,7 +165,7 @@ function setConfigListeners() {
                 if(data.status) {
                     config.actions = JSON.parse(JSON.stringify(data.data));
                 }
-                Cookies.set('config', config);
+                Cookies.set('config', config, {expires: cookieExpireDays});
                 chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
                 location.reload(false);
             },

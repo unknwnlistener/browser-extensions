@@ -4,37 +4,42 @@ var globalBuffer = [];
 var globalLastKeyTime = Date.now();
 var listener;
 
-// JQUERY $(document).ready(() =>{})
+
+// JQUERY -- $(document).ready(() =>{})
 function ready(fn) {
     if (document.readyState != 'loading'){
         fn();
     } else {
+        document.removeEventListener('DOMContentLoaded', fn);
         document.addEventListener('DOMContentLoaded', fn);
     }
 }
 
 ready(() => {
     try {
-        globalBuffer = [];
-        const options = {
-            eventType: 'keydown',
-            keystrokeDelay: 5000
-        }
-        document.removeEventListener('click', handleMouseClick);
-        document.addEventListener('click', handleMouseClick);
-        keyMapper(options);
-
-        const delay = hasProperty('keystrokeDelay', options) && options.keystrokeDelay >= 300 && options.keystrokeDelay;
-        const keystrokeDelay = delay || 1000;
-        // Logic: Every second check if the last key time (global) was longer than the delay time ago. If it was than send what is in the buffer and reset it
-        window.setInterval(() => {
-            if(globalBuffer && globalBuffer.length != 0 && (Date.now() - globalLastKeyTime > keystrokeDelay)) {
-                console.log("Buffer check active", globalBuffer, Date.now());
-                sendBufferData();
+        chrome.runtime.sendMessage({source: 'config'}, (res) => { //Wait for config response
+            let config = res ? JSON.parse(res.config): {};
+            globalBuffer = [];
+            const options = {
+                eventType: 'keydown',
+                keystrokeDelay: hasProperty('actions', config) && hasProperty('keystrokes', config.actions) && hasProperty('delay', config.actions.keystrokes) ? +config.actions.keystrokes.delay : 5000
             }
-        }, 1000); // 1 seconds
+            document.removeEventListener('click', handleMouseClick);
+            document.addEventListener('click', handleMouseClick);
+            keyMapper(options);
+            const delay = hasProperty('keystrokeDelay', options) && options.keystrokeDelay >= 300 && options.keystrokeDelay;
+            const keystrokeDelay = delay || 1000;
+            // Logic: Every second check if the last key time (global) was longer than the delay time ago. If it was than send what is in the buffer and reset it
+            window.setInterval(() => {
+                if(globalBuffer && globalBuffer.length != 0 && (Date.now() - globalLastKeyTime > keystrokeDelay)) {
+                    console.log("Buffer check active", globalBuffer, Date.now());
+                    sendBufferData();
+                }
+            }, 1000); // 1 seconds
+        });
+
     }catch(e) {
-        console.log("Cannot remove event listener", e);
+        console.warn("Cannot remove event listener", e);
     }
 });
 
@@ -43,27 +48,20 @@ function handleMouseClick(event) {
         console.log("Event before sending", event);
         chrome.runtime.sendMessage({source: 'target', mouse: {pageX: event.pageX, pageY: event.pageY}});
     } catch(e) {
-        console.log("Chrome V engine problems");
+        console.warn("Chrome V engine problems");
     }
-  
-    // console.log("In target page", event);
 }
 
 function keyMapper(options) {
-    const delay = hasProperty('keystrokeDelay', options) && options.keystrokeDelay >= 300 && options.keystrokeDelay;
-    const keystrokeDelay = delay || 1000;
     const eventType = hasProperty('eventType', options) && options.eventType || 'keydown';
-    document.removeEventListener(eventType, handleKeyboardInput)
+    document.removeEventListener(eventType, handleKeyboardInput);
     document.addEventListener(eventType, handleKeyboardInput);   
-
-    // keyboardJS.bind('', (e) => {
-    //     console.log(e.key, "key was pressed");
-    // });
 }
 
 function handleKeyboardInput(event) {
     let key = event.key;
     try {
+        // Logic: Special names to store special keys. Can be added to based on requirement
         switch(event.key) {
             case "Control":
                 key = "Ctrl";
@@ -74,12 +72,6 @@ function handleKeyboardInput(event) {
             case " ":
                 key = "Space";
                 break;
-            // case "Enter":
-            // case "Alt":
-            // case "AltGraph":
-            // case "Shift":
-            // case "CapsLock":
-            // case "Tab":
         }
         
         const currentTime =  Date.now();
@@ -89,7 +81,7 @@ function handleKeyboardInput(event) {
             sendBufferData();
         }
     } catch(e) {
-        console.log("Chrome V keyboard problems");
+        console.warn("Chrome V keyboard problems");
     }
 }
 

@@ -22,28 +22,29 @@ let isSetListeners = false;
 
 $(document).ready(() => {
     console.log("[BACKGROUND] Loaded page", Cookies.get('token'), Cookies.get('config'));
-    
+
     chrome.windows.getCurrent((activeWindow) => {
         currentWindowId = activeWindow.id;
     });
 
     // User already logged in
     if (currentToken) {
+        readConfig();
         addTabListeners();
     }
-    
+
     // Listener for cookies
-    chrome.runtime.onMessage.addListener((request, sender) => {
+    chrome.runtime.onMessage.addListener((request, sender, res) => {
         currentToken = Cookies.get('token');
-        if(currentToken) {
-            if(request.source === "popup") {
+        if (currentToken) {
+            if (request.source === "popup") {
                 let currentConfig = JSON.parse(Cookies.get('config'));
-                console.log("[BACKGROUND][COOKIES] : ",request, Cookies.get('token'), currentConfig);
+                console.log("[BACKGROUND][COOKIES] : ", request, Cookies.get('token'), currentConfig);
                 addTabListeners();
-            } else if(request.source === "target") {
+            } else if (request.source === "target") {
                 let mouseEvent = request.mouse;
                 console.log("[MESSAGE SEND] Mouse event sent", request);
-                
+
                 dataObj = {
                     action: 'mouse_click',
                     tabId: deviceClickActiveTab.tabId,
@@ -65,6 +66,9 @@ $(document).ready(() => {
                     keys: keyEvent.join(' ')
                 }
                 actionPostApi(currentToken, dataObj);
+            } else if (request.source === "config") {
+                console.log("[DEBUG] Received call for CONFIG");
+                res({ source: 'config', config: Cookies.get('config')});
             }
         } else {
             console.log("[BACKGROUND] Removed listener for Tabs");
@@ -79,7 +83,7 @@ $(document).ready(() => {
 function actionPostApi(currentToken, dataObj) {
     dataObj['client_timestamp'] = Date.now();
     let isValidAction = checkEnabledAction(dataObj['action']);
-    if(isValidAction) {
+    if (isValidAction) {
         console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action']);
         $.ajax({
             url: `${currentUrl}/api/users/actions`,
@@ -103,7 +107,7 @@ function actionPostApi(currentToken, dataObj) {
 function checkEnabledAction(action) {
     let currentConfig = JSON.parse(Cookies.get('config'));
     console.log("[DEBUG] currentConfig & action", currentConfig, action);
-    return currentConfig && (currentConfig.hasOwnProperty("actions") && currentConfig.actions.hasOwnProperty(action) && currentConfig.actions[action].hasOwnProperty("active") ? currentConfig.actions[action]["active"].toString() === "true": false);
+    return currentConfig && (currentConfig.hasOwnProperty("actions") && currentConfig.actions.hasOwnProperty(action) && currentConfig.actions[action].hasOwnProperty("active") ? currentConfig.actions[action]["active"].toString() === "true" : false);
 }
 
 
@@ -111,22 +115,22 @@ function addTabListeners() {
     // Filtering out tab values not in the active window
     // Named callback for the event listener so that the listener can be removed later
     console.log()
-    if(!isSetListeners) {
+    if (!isSetListeners) {
         console.log("[BACKGROUND] Adding listener for tabs");
         isSetListeners = true;
         // Guard for listener based on config
         // if(checkEnabledAction('url') || checkEnabledAction('tab_opened')) {
         chrome.tabs.onUpdated.addListener(tabUpdates = (tabId, changeInfo, activeTab) => {
-            if(activeTab.windowId == currentWindowId) {
-                if(changeInfo.status === "complete") {
-                    if(activeTab.url == "chrome://newtab/") { // New tab -- Specific to Brave browser?
+            if (activeTab.windowId == currentWindowId) {
+                if (changeInfo.status === "complete") {
+                    if (activeTab.url == "chrome://newtab/") { // New tab -- Specific to Brave browser?
                         let dataObj = {
                             action: 'tab_opened',
                             tabId: tabId,
                             windowId: currentWindowId
                         }
                         actionPostApi(currentToken, dataObj);
-                    } else if(activeTab.url && (activeTab.url.startsWith('https://') || activeTab.url.startsWith('http://'))) {
+                    } else if (activeTab.url && (activeTab.url.startsWith('https://') || activeTab.url.startsWith('http://'))) {
                         // Info to store -- url, tabId, windowId
                         console.log("%c[DEBUG]...Recording new URL....", "color: blue; font-size: 14px;");
                         let dataObj = {
@@ -148,7 +152,7 @@ function addTabListeners() {
         // Guard for listener based on config
         // if(checkEnabledAction('tab_closed')) {
         chrome.tabs.onRemoved.addListener(tabRemoved = (tabId, removeInfo) => {
-            if(removeInfo.windowId == currentWindowId) {
+            if (removeInfo.windowId == currentWindowId) {
                 let dataObj = {
                     action: 'tab_closed',
                     tabId: tabId,
@@ -169,10 +173,8 @@ function addDeviceEventListeners(tabId, windowId, url) {
     // Mouseclick event gets reset when a new url is navigated to in the same tab
 
     // TEST -- Change urls on the same page and see how many listeners get added
-    chrome.tabs.executeScript(tabId, {file: './js/keyboard.min.js'}, () => {
-        chrome.tabs.executeScript(tabId, {file: './js/pageEventListeners.js'}, () => {
-            console.log("[CALLBACK] Injected script in other page");
-        });
+    chrome.tabs.executeScript(tabId, { file: './js/pageEventListeners.js' }, () => {
+        console.log("[CALLBACK] Injected script in other page");
     });
 }
 
@@ -185,9 +187,9 @@ function capturePageScreenshot(tabId, windowId, url) {
     let imageFormat = 'jpeg';
     // chrome.browserAction.onClicked.addListener((tab)=> console.log("[DEBUG] TABSSS", tab));
     console.log("[DEBUG] Capturing Screenshot...");
-    chrome.tabs.captureVisibleTab(windowId, {format: imageFormat}, (image) => {
+    chrome.tabs.captureVisibleTab(windowId, { format: imageFormat }, (image) => {
         // console.log("Capturing screenshot", image);
-        if(image) saveImage(image, imageFormat);
+        if (image) saveImage(image, imageFormat);
     });
     // window.scrollTo(0,200);
 
@@ -197,8 +199,8 @@ function saveBlobAsFile(blob, fileName) {
     let reader = new FileReader();
     reader.readAsDataURL(blob);
 
-    reader.onload = function () {    
-        var base64 = reader.result ;
+    reader.onload = function () {
+        var base64 = reader.result;
         console.log("Image base64: ", base64);
         var link = document.createElement("a");
 
@@ -224,8 +226,32 @@ function filename(format) {
     var pad = (n) => (n = n + '', n.length >= 2 ? n : `0${n}`)
     var ext = (format) => format === 'jpeg' ? 'jpg' : format === 'png' ? 'png' : 'png'
     var timestamp = (now) =>
-      [pad(now.getFullYear()), pad(now.getMonth() + 1), pad(now.getDate())].join('-')
-      + ' - ' +
-      [pad(now.getHours()), pad(now.getMinutes()), pad(now.getSeconds())].join('-')
+        [pad(now.getFullYear()), pad(now.getMonth() + 1), pad(now.getDate())].join('-')
+        + ' - ' +
+        [pad(now.getHours()), pad(now.getMinutes()), pad(now.getSeconds())].join('-')
     return `Screenshot Capture - ${timestamp(new Date())}.${ext(format)}`
+}
+
+function readConfig() {
+    $.ajax({
+        url: `${currentUrl}/api/config`,
+        type: "GET",
+        headers: {
+            'Authorization': `Bearer ${Cookies.get('token')}`,
+        },
+        success: (data) => {
+            let config = {};
+            if(data.status) {
+                config.actions = JSON.parse(JSON.stringify(data.data));
+            }
+            console.log("Config file received = ", data);
+            Cookies.set('config', config, {expires: 1});
+        },
+        error: (e) => {
+            if(e.status != 403)
+                console.error("Could not read config", e);
+            else
+                console.log("Forbidden", e);
+        }
+    });
 }
