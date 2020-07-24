@@ -20,6 +20,7 @@ $(document).ready(() => {
     $('#logout').click(() => {
         console.log("Logging user out");
         Cookies.remove('token');
+        Cookies.remove('config');
         chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
         location.reload(false);
     });

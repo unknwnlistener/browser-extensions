@@ -14,6 +14,7 @@ const currentUrl = 'http://localhost:3000';
 */
 var currentWindowId;
 var currentToken = Cookies.get('token');
+var currentConfig;
 // let configCookie = Cookies.get('config');
 // var currentConfig = configCookie ? JSON.parse(configCookie) : configCookie;
 var deviceClickActiveTab;
@@ -23,9 +24,9 @@ let isSetListeners = false;
 $(document).ready(() => {
     console.log("[BACKGROUND] Loaded page", Cookies.get('token'), Cookies.get('config'));
 
-    chrome.windows.getCurrent((activeWindow) => {
-        currentWindowId = activeWindow.id;
-    });
+    // chrome.windows.getCurrent((activeWindow) => {
+    //     currentWindowId = activeWindow.id;
+    // });
 
     // User already logged in
     if (currentToken) {
@@ -35,11 +36,10 @@ $(document).ready(() => {
 
     // Listener for cookies
     chrome.runtime.onMessage.addListener((request, sender, res) => {
-        currentToken = Cookies.get('token');
-        if (currentToken) {
+        if (Cookies.get('token')) {
+            readConfig();
             if (request.source === "popup") {
-                let currentConfig = JSON.parse(Cookies.get('config'));
-                console.log("[BACKGROUND][COOKIES] : ", request, Cookies.get('token'), currentConfig);
+                console.log("[BACKGROUND][COOKIES] : ", request, Cookies.get('token'), Cookies.get('config'));
                 addTabListeners();
             } else if (request.source === "target") {
                 let mouseEvent = request.mouse;
@@ -53,7 +53,6 @@ $(document).ready(() => {
                     mouse_x: mouseEvent.pageX,
                     mouse_y: mouseEvent.pageY
                 }
-                // console.log("[REST] Sending mouse click data", dataObj);
                 actionPostApi(currentToken, dataObj);
             } else if (request.source === "keyboard") {
                 let keyEvent = request.data;
@@ -71,10 +70,15 @@ $(document).ready(() => {
                 res({ source: 'config', config: Cookies.get('config')});
             }
         } else {
-            console.log("[BACKGROUND] Removed listener for Tabs");
-            chrome.tabs.onUpdated.removeListener(tabUpdates);
-            chrome.tabs.onRemoved.removeListener(tabRemoved);
-            isSetListeners = false;
+            try {
+                console.log("[BACKGROUND] Removed listener for Tabs");
+                chrome.tabs.onUpdated.removeListener(tabUpdates);
+                chrome.tabs.onRemoved.removeListener(tabRemoved);
+            } catch(e) {
+                console.warn("Listeners not yet added");
+            } finally {
+                isSetListeners = false;
+            }
         }
     });
 });
@@ -106,7 +110,6 @@ function actionPostApi(currentToken, dataObj) {
 
 function checkEnabledAction(action) {
     let currentConfig = JSON.parse(Cookies.get('config'));
-    console.log("[DEBUG] currentConfig & action", currentConfig, action);
     return currentConfig && (currentConfig.hasOwnProperty("actions") && currentConfig.actions.hasOwnProperty(action) && currentConfig.actions[action].hasOwnProperty("active") ? currentConfig.actions[action]["active"].toString() === "true" : false);
 }
 
@@ -114,20 +117,19 @@ function checkEnabledAction(action) {
 function addTabListeners() {
     // Filtering out tab values not in the active window
     // Named callback for the event listener so that the listener can be removed later
-    console.log()
     if (!isSetListeners) {
         console.log("[BACKGROUND] Adding listener for tabs");
         isSetListeners = true;
         // Guard for listener based on config
         // if(checkEnabledAction('url') || checkEnabledAction('tab_opened')) {
         chrome.tabs.onUpdated.addListener(tabUpdates = (tabId, changeInfo, activeTab) => {
-            if (activeTab.windowId == currentWindowId) {
+            // if (activeTab.windowId == currentWindowId) {
                 if (changeInfo.status === "complete") {
                     if (activeTab.url == "chrome://newtab/") { // New tab -- Specific to Brave browser?
                         let dataObj = {
                             action: 'tab_opened',
                             tabId: tabId,
-                            windowId: currentWindowId
+                            windowId: activeTab.windowId
                         }
                         actionPostApi(currentToken, dataObj);
                     } else if (activeTab.url && (activeTab.url.startsWith('https://') || activeTab.url.startsWith('http://'))) {
@@ -137,29 +139,29 @@ function addTabListeners() {
                             action: 'url',
                             tabId: tabId,
                             url: activeTab.url,
-                            windowId: currentWindowId
+                            windowId: activeTab.windowId
                         }
-                        addDeviceEventListeners(tabId, currentWindowId, activeTab.url);
+                        addDeviceEventListeners(tabId, activeTab.windowId, activeTab.url);
                         actionPostApi(currentToken, dataObj);
                         //[TODO] Temporarily disabled
-                        // capturePageScreenshot(tabId, currentWindowId, activeTab.url);
+                        // capturePageScreenshot(tabId, activeTab.windowId, activeTab.url);
                     }
                 }
-            }
+            // }
         });
         // }
         // Tab closing
         // Guard for listener based on config
         // if(checkEnabledAction('tab_closed')) {
         chrome.tabs.onRemoved.addListener(tabRemoved = (tabId, removeInfo) => {
-            if (removeInfo.windowId == currentWindowId) {
+            // if (removeInfo.windowId == currentWindowId) {
                 let dataObj = {
                     action: 'tab_closed',
                     tabId: tabId,
-                    windowId: currentWindowId
+                    windowId: removeInfo.windowId
                 }
                 actionPostApi(currentToken, dataObj);
-            }
+            // }
         });
         // }
 
@@ -244,14 +246,13 @@ function readConfig() {
             if(data.status) {
                 config.actions = JSON.parse(JSON.stringify(data.data));
             }
-            console.log("Config file received = ", data);
             Cookies.set('config', config, {expires: 1});
         },
         error: (e) => {
             if(e.status != 403)
                 console.error("Could not read config", e);
             else
-                console.log("Forbidden", e);
+                console.warn("Forbidden", e);
         }
     });
 }
