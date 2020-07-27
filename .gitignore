@@ -10,3 +10,6 @@ node_modules/
 #Ignore sass files for now
 *.scss
 *.css.map
+
+#Ignore environment files
+*.env

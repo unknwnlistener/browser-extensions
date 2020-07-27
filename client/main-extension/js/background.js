@@ -70,18 +70,22 @@ $(document).ready(() => {
                 res({ source: 'config', config: Cookies.get('config')});
             }
         } else {
-            try {
-                console.log("[BACKGROUND] Removed listener for Tabs");
-                chrome.tabs.onUpdated.removeListener(tabUpdates);
-                chrome.tabs.onRemoved.removeListener(tabRemoved);
-            } catch(e) {
-                console.warn("Listeners not yet added");
-            } finally {
-                isSetListeners = false;
-            }
+            removeTabListeners();
         }
     });
 });
+
+function removeTabListeners() {
+    try {
+        console.log("[BACKGROUND] Removed listener for Tabs");
+        chrome.tabs.onUpdated.removeListener(tabUpdates);
+        chrome.tabs.onRemoved.removeListener(tabRemoved);
+    } catch(e) {
+        console.warn("Listeners not yet added");
+    } finally {
+        isSetListeners = false;
+    }
+}
 
 
 function actionPostApi(currentToken, dataObj) {
