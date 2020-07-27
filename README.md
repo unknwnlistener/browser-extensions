@@ -4,7 +4,7 @@ Testing Chrome extension projects
 ### Usage
 Follow these steps to start node server:
 * Go to root folder of project
-* Run `node .\server\server.js` on the terminal
+* Run `node .\server.js` on the terminal
 * Open `localhost:3000` in a browser
 
 ### Current Routes

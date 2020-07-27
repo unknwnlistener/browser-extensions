@@ -1,31 +1,33 @@
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+require('./server/api/models/actionModel').default; 
+require('./server/api/models/userModel').default; 
 
-require('./api/models/actionModel').default; //importing Model
-require('./api/models/userModel').default; //importing Model
-
-var port = process.env.PORT || 3000;
+const connUri = process.env.DB_CONNECTION;
+let port = process.env.PORT || 3000;
 
 // mongoose instance connection url connection
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb+srv://cs20108admin:fkAFVJSWTWPOHSgg@cluster0-i4i3t.mongodb.net/webrecorder?retryWrites=true&w=majority', (err) => { //Change path to Atlas
+mongoose.connect(connUri, (err) => {
     if(err) { console.log("UNSUCCESSFUL : ",err); }
 }); 
 console.log("DB Connected successfully");
 
-var swagger = require('./swagger'); // configure swagger
+var swagger = require('./server/swagger'); // configure swagger
 swagger(app);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static("../client/public"));
+app.use(express.static("./client/public"));
 
-let auth = require('./api/routes/authRoutes');
+let auth = require('./server/api/routes/authRoutes');
 app.use('/api', auth);
 
-let api = require('./api/routes/apiRoutes'); //importing routes
+let api = require('./server/api/routes/apiRoutes'); //importing routes
 app.use('/api', api); //register the route
 
 app.use(function(req, res) {

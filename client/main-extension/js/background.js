@@ -1,4 +1,5 @@
-const currentUrl = 'http://localhost:3000';
+require('dotenv').config();
+const currentUrl = process.env.BASE_URL || 'localhost:3000';
 
 /* Record and send a post command for every new action
 1. Console log different actions

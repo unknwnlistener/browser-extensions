@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 
 const common = require('../utilities/common');
 const authRepo = require('../repositories/authRepository');
-const secretValue = 'mySecret'; // [TODO] Change the location of secret to a config file
+const secretValue = process.env.JWT_SECRET; 
 
 let fs = require('fs');
 const path = require('path');
