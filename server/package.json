@@ -36,5 +36,8 @@
     "mongoose-sequence": "^5.2.2",
     "swagger-jsdoc": "^4.0.0",
     "swagger-ui-express": "^4.1.4"
+  },
+  "engines": {
+    "node": "12.x"
   }
 }
