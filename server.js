@@ -17,7 +17,7 @@ mongoose.connect(connUri, (err) => {
 }); 
 console.log("DB Connected successfully");
 
-var swagger = require('./server/swagger'); // configure swagger
+var swagger = require('./swagger'); // configure swagger
 swagger(app);
 
 app.use(bodyParser.urlencoded({ extended: true }));
