@@ -1,4 +1,5 @@
-const currentUrl = 'https://ancient-coast-51172.herokuapp.com/';//'localhost:3000'; 
+require('dotenv').config();
+const currentUrl = process.env.BASE_URL || 'localhost:3000';
 
 /* Record and send a post command for every new action
 1. Console log different actions
@@ -254,7 +255,7 @@ function readConfig() {
         },
         error: (e) => {
             if(e.status != 403)
-                console.error("[BG] Could not read config", e);
+                console.error("Could not read config", e);
             else
                 console.warn("Forbidden", e);
         }

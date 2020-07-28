@@ -18,6 +18,7 @@
         "activeTab",
         "tabs",
         "cookies",
-        "<all_urls>"
+        "<all_urls>",
+        "http://localhost:3000/*"
     ]
 }

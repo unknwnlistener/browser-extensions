@@ -1,5 +1,5 @@
 // Passing data through REST APIs to Node server
-const currentUrl = 'https://ancient-coast-51172.herokuapp.com/';//'http://localhost:3000';
+const currentUrl = 'http://localhost:3000';
 // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWRhMTc2ZmMwMjA3YzQxMDBlM2JiYTkiLCJpYXQiOjE1OTEzNTExNTF9.-HonhXPYV2S0DUyNNStY9qeGqWCW5M_IkNlrlmrx3bs';
 
 let config = {};
@@ -9,6 +9,8 @@ $(document).ready(() => {
     if(Cookies.get('token')) {
         $('.main').replaceWith(loggedInMessageHtml());
     }
+
+    readConfig();
 
     $('#register').click(() => {
         console.log("Register button clicked");
@@ -111,7 +113,7 @@ function readConfig() {
         error: (e) => {
             $(".test-mode").css("display", "none");
             if(e.status != 403)
-                console.error("[POPUP] Could not read config", e);
+                console.error("Could not read config", e);
             else
                 console.log("Forbidden", e);
         }
