@@ -1,4 +1,5 @@
-const currentUrl = 'https://ancient-coast-51172.herokuapp.com'; //'localhost:3000';
+// const currentUrl = 'http://localhost:3000';
+const currentUrl = 'https://ancient-coast-51172.herokuapp.com'; 
 
 /* Record and send a post command for every new action
 1. Console log different actions
@@ -17,7 +18,7 @@ var currentToken = Cookies.get('token');
 var currentConfig;
 // let configCookie = Cookies.get('config');
 // var currentConfig = configCookie ? JSON.parse(configCookie) : configCookie;
-var deviceClickActiveTab;
+var activeTabList = [];
 
 let isSetListeners = false;
 
@@ -47,9 +48,9 @@ $(document).ready(() => {
 
                 dataObj = {
                     action: 'mouse_click',
-                    tabId: deviceClickActiveTab.tabId,
-                    url: deviceClickActiveTab.url,
-                    windowId: deviceClickActiveTab.windowId,
+                    tabId: activeTabList.tabId,
+                    url: activeTabList.url,
+                    windowId: activeTabList.windowId,
                     mouse_x: mouseEvent.pageX,
                     mouse_y: mouseEvent.pageY
                 }
@@ -59,15 +60,12 @@ $(document).ready(() => {
                 console.log("Keyboard event recorded ", keyEvent.join(' '));
                 dataObj = {
                     action: 'keystrokes',
-                    tabId: deviceClickActiveTab.tabId,
-                    url: deviceClickActiveTab.url,
-                    windowId: deviceClickActiveTab.windowId,
+                    tabId: activeTabList.tabId,
+                    url: activeTabList.url,
+                    windowId: activeTabList.windowId,
                     keys: keyEvent.join(' ')
                 }
                 actionPostApi(currentToken, dataObj);
-            } else if (request.source === "config") {
-                console.log("[DEBUG] Received call for CONFIG");
-                res({ source: 'config', config: Cookies.get('config')});
             }
         } else {
             removeTabListeners();
@@ -104,7 +102,7 @@ function actionPostApi(currentToken, dataObj) {
                 console.log("[ACTION][POST] Successful", data);
             },
             error: (err) => {
-                console.error(err);
+                console.error("[ACTION]{POST} Unsuccesful ", err);
             }
         });
     } else {
@@ -119,44 +117,37 @@ function checkEnabledAction(action) {
 
 
 function addTabListeners() {
-    // Filtering out tab values not in the active window
     // Named callback for the event listener so that the listener can be removed later
     if (!isSetListeners) {
         console.log("[BACKGROUND] Adding listener for tabs");
         isSetListeners = true;
-        // Guard for listener based on config
-        // if(checkEnabledAction('url') || checkEnabledAction('tab_opened')) {
         chrome.tabs.onUpdated.addListener(tabUpdates = (tabId, changeInfo, activeTab) => {
             // if (activeTab.windowId == currentWindowId) {
-                if (changeInfo.status === "complete") {
-                    if (activeTab.url == "chrome://newtab/") { // New tab -- Specific to Brave browser?
-                        let dataObj = {
-                            action: 'tab_opened',
-                            tabId: tabId,
-                            windowId: activeTab.windowId
-                        }
-                        actionPostApi(currentToken, dataObj);
-                    } else if (activeTab.url && (activeTab.url.startsWith('https://') || activeTab.url.startsWith('http://'))) {
-                        // Info to store -- url, tabId, windowId
-                        console.log("%c[DEBUG]...Recording new URL....", "color: blue; font-size: 14px;");
-                        let dataObj = {
-                            action: 'url',
-                            tabId: tabId,
-                            url: activeTab.url,
-                            windowId: activeTab.windowId
-                        }
-                        addDeviceEventListeners(tabId, activeTab.windowId, activeTab.url);
-                        actionPostApi(currentToken, dataObj);
-                        //[TODO] Temporarily disabled
-                        // capturePageScreenshot(tabId, activeTab.windowId, activeTab.url);
+            if (changeInfo.status === "complete") {
+                if (activeTab.url == "chrome://newtab/") { // New tab -- Specific to Brave browser?
+                    let dataObj = {
+                        action: 'tab_opened',
+                        tabId: tabId,
+                        windowId: activeTab.windowId
                     }
+                    actionPostApi(currentToken, dataObj);
+                } else if (activeTab.url && (activeTab.url.startsWith('https://') || activeTab.url.startsWith('http://'))) {
+                    // Info to store -- url, tabId, windowId
+                    console.log("%c[DEBUG]...Recording new URL....", "color: blue; font-size: 14px;");
+                    let dataObj = {
+                        action: 'url',
+                        tabId: tabId,
+                        url: activeTab.url,
+                        windowId: activeTab.windowId
+                    }
+                    addDeviceEventListeners(tabId, activeTab.windowId, activeTab.url);
+                    actionPostApi(currentToken, dataObj);
+                    //[TODO] Temporarily disabled
+                    // capturePageScreenshot(tabId, activeTab.windowId, activeTab.url);
                 }
+            }
             // }
         });
-        // }
-        // Tab closing
-        // Guard for listener based on config
-        // if(checkEnabledAction('tab_closed')) {
         chrome.tabs.onRemoved.addListener(tabRemoved = (tabId, removeInfo) => {
             // if (removeInfo.windowId == currentWindowId) {
                 let dataObj = {
@@ -167,21 +158,22 @@ function addTabListeners() {
                 actionPostApi(currentToken, dataObj);
             // }
         });
-        // }
 
     }
 }
 
 function addDeviceEventListeners(tabId, windowId, url) {
     // Mouseclick actions
-    deviceClickActiveTab = { tabId: tabId, windowId: windowId, url: url };
-    // IDEA: Instead of listenening to every active tab being highlighted, what if listeners were added to every new URL. This way even if the user is on the same tab and continues surfing, mouseclick listeners will always be present.
-    // Mouseclick event gets reset when a new url is navigated to in the same tab
+    if(!activeTabList.includes(tabId)) {
+        activeTabList.push(tabId);
+        // IDEA: Instead of listenening to every active tab being highlighted, what if listeners were added to every new URL. This way even if the user is on the same tab and continues surfing, mouseclick listeners will always be present.
+        // Mouseclick event gets reset when a new url is navigated to in the same tab
 
-    // TEST -- Change urls on the same page and see how many listeners get added
-    chrome.tabs.executeScript(tabId, { file: './js/pageEventListeners.js' }, () => {
-        console.log("[CALLBACK] Injected script in other page");
-    });
+        // TEST -- Change urls on the same page and see how many listeners get added
+        chrome.tabs.executeScript(tabId, { file: './js/pageEventListeners.js' }, () => {
+            console.log("[CALLBACK] Injected script in other page");
+        });
+    }
 }
 
 function capturePageScreenshot(tabId, windowId, url) {
@@ -251,6 +243,9 @@ function readConfig() {
                 config.actions = JSON.parse(JSON.stringify(data.data));
             }
             Cookies.set('config', config, {expires: 1});
+            chrome.storage.sync.set({'config': config}, function() {
+                console.log("[BG] Chrome storage value is set to ", config);
+            });
         },
         error: (e) => {
             if(e.status != 403)

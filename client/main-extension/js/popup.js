@@ -1,24 +1,25 @@
 // Passing data through REST APIs to Node server
-const currentUrl = 'https://ancient-coast-51172.herokuapp.com'; //'http://localhost:3000';
+// const currentUrl = 'http://localhost:3000';
+const currentUrl = 'https://ancient-coast-51172.herokuapp.com'; 
 // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWRhMTc2ZmMwMjA3YzQxMDBlM2JiYTkiLCJpYXQiOjE1OTEzNTExNTF9.-HonhXPYV2S0DUyNNStY9qeGqWCW5M_IkNlrlmrx3bs';
 
 let config = {};
 const cookieExpireDays = 1; //Number value representing number of days cookie will be active.
 
 $(document).ready(() => {
+    // Already logged in
     if(Cookies.get('token')) {
+        readConfig();
         $('.main').replaceWith(loggedInMessageHtml());
     }
 
-    readConfig();
-
+    // Adding listeners
     $('#register').click(() => {
-        console.log("Register button clicked");
         popupRegister();
     });
 
     $('#logout').click(() => {
-        console.log("Logging user out");
+        console.log("Logging user out...");
         Cookies.remove('token');
         Cookies.remove('config');
         chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
@@ -32,7 +33,7 @@ $(document).ready(() => {
 
     // REST call to login
     $('#login').click((e) => {
-        console.log("Logging the user in");
+        console.log("Logging the user in...");
 
         $.ajax({
             url: `${currentUrl}/api/login`,
@@ -42,24 +43,24 @@ $(document).ready(() => {
                 if(data.status) {
                     Cookies.set("token", data.data.token, {expires: cookieExpireDays});
                 }
-                console.log("Packet receieved = ", data);
-                console.log("Cookie set : ", Cookies.get("token"));
-                readConfig();
                 chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
-                location.reload(false);
+                $('.main').replaceWith(loggedInMessageHtml());
+                readConfig();
             },
             error: () => {
-                console.log("Invalid credentials entered", "color: red");
+                console.log("Invalid credentials entered", "color: red;");
                 $('.error-msg').css('display', 'block');
             }
         });
 
         e.preventDefault();
-
-        // Save the returned token to cookie. User session is now logged in.
     });
 
 });
+
+function addLoginListener() {
+    
+}
 
 function loggedInMessageHtml() {
     let messageHtml = `
@@ -108,7 +109,10 @@ function readConfig() {
             $(".test-mode").css("display", "block");
             $(".settings").html(generateToggleRows());
             Cookies.set('config', config, {expires: cookieExpireDays});
-            setConfigListeners();
+            chrome.storage.sync.set({'config': config}, function() {
+                console.log("[POPUP] Chrome storage value is set to ", config);
+            });
+            setConfigToggle();
         },
         error: (e) => {
             $(".test-mode").css("display", "none");
@@ -140,7 +144,7 @@ function generateToggleRows() {
 }
 
 // Updates the config={} object. [TODO] Send that config to server and the server will handle that config to send data
-function setConfigListeners() {
+function setConfigToggle() {
     console.log("Setting test button values : ", JSON.stringify(config));
     $('input:checkbox').change(function(){
         if(($(this)).is(':checked')) {
@@ -167,6 +171,9 @@ function setConfigListeners() {
                     config.actions = JSON.parse(JSON.stringify(data.data));
                 }
                 Cookies.set('config', config, {expires: cookieExpireDays});
+                chrome.storage.sync.set({'config': config}, function() {
+                    console.log("[POPUP] Chrome storage value is set to ", config);
+                });
                 chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
                 location.reload(false);
             },

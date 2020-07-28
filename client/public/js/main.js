@@ -1,5 +1,8 @@
 let isInvalidEmail = true;
 let isInvalidPassword = true;
+// const currentUrl = //'https://ancient-coast-51172.herokuapp.com';
+const currentUrl = 'http://localhost:3000';
+
 
 $(function() {
 
@@ -11,7 +14,7 @@ $(function() {
         if(!isInvalidEmail && !isInvalidPassword) {
             console.log($('#register-form').serialize());
             $.ajax({
-                url: "http://https://ancient-coast-51172.herokuapp.com/api/register",
+                url: `${currentUrl}/api/register`,
                 type: 'POST',
                 data: $('#register-form').serialize(),
                 success: function (data) {
