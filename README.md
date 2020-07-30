@@ -1,22 +1,40 @@
-# browser-extensions
-Testing Chrome extension projects
+# WebRecorder Toolkit
+Project codebase as per the requirement of MSc in Computer Science (Software Engineering) course CS640.
 
 ### Usage
-Follow these steps to start node server:
+The following steps are to start a node server locally:
 * Go to root folder of project
-* Run `node .\server.js` on the terminal
+* Run `node .\server.js` in the terminal
 
-### Current Routes
+To setup the tool for conducting a new experiment, we followed the following steps 
+1.	Install Chrome or a Chromium based browser (e.g. Brave) on the machine.
+2.	In the browser, navigate to the Extensions page. 
+3.	Enable developer mode by checking the checkbox in the Extensions page
+4.	Load the Tool’s client directory as an unpacked extension
+5.	Start/Enable the extension
+
+`client/` folder is the unpacked browser extension folder. 
+
+### API Calls
 * `/api/users/actions` 
     - `GET` call to retrieve all actions for all users
     - `POST` call to create a new action entry for current user
 
-* `api/users/:id/actions`
+* `/api/users/:id/actions`
     - `GET` call to retrieve all actions for a specific user id
 
-* `api/users`
-    - `GET` call to retrieve all users in system [TODO] Add permissions to this call
-    - `POST` call to create a new user
+* `/api/users`
+    - `GET` call to retrieve all users in system 
+
+* `/api/register`
+    - `POST` call to create a new user in the system
+
+* `/api/login`
+    - `POST` call to generate a token for an authenticated user
+
+* `/api/config`
+    - `GET` call retrieves the `config.js` file on the server
+    - `PUT` call updates the `config.js` file
 
 ### Resources
 ###### Node.js
