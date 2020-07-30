@@ -34,7 +34,7 @@ swagger(app);
 // PARSER SET UP
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static("./client/public"));
+app.use(express.static("./public"));
 
 // IMPORTING ROUTES
 let api = require('./server/api/routes/apiRoutes'); 
