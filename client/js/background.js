@@ -92,7 +92,7 @@ function actionPostApi(currentToken, dataObj) {
     dataObj['client_timestamp'] = Date.now();
     let isValidAction = checkEnabledAction(dataObj['action']);
     if (isValidAction) {
-        console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action'], currentToken);
+        console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action']);
         $.ajax({
             url: `${currentUrl}/api/users/actions`,
             type: "POST",

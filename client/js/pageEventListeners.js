@@ -34,14 +34,14 @@ ready(() => {
         chrome.storage.sync.get(['config'], function(result) {
             let config = result ? result.config: {};
             globalBuffer = [];
-            const options = {
-                eventType: 'keydown',
-                keystrokeDelay: hasProperty('actions', config) && hasProperty('keystrokes', config.actions) && hasProperty('delay', config.actions.keystrokes) ? +config.actions.keystrokes.delay : 5000
-            }
+            let configDelay = hasProperty('actions', config) && hasProperty('keystrokes', config.actions) && hasProperty('delay', config.actions.keystrokes) ? +config.actions.keystrokes.delay : 5000
             document.removeEventListener('click', handleMouseClick);
             document.addEventListener('click', handleMouseClick);
-            keyMapper(options);
-            const delay = hasProperty('keystrokeDelay', options) && options.keystrokeDelay >= 300 && options.keystrokeDelay;
+            // keyMapper(options);
+            document.removeEventListener('keydown', handleKeyboardInput);
+            document.addEventListener('keydown', handleKeyboardInput);   
+
+            const delay = configDelay >= 300 && configDelay;
             const keystrokeDelay = delay || 5000;
             // Logic: Every second check if the last key time (global) was longer than the delay time ago. If it was than send what is in the buffer and reset it
             intervalId = window.setInterval(() => {
@@ -64,13 +64,13 @@ function handleMouseClick(event) {
         chrome.runtime.sendMessage({source: 'target', mouse: {pageX: event.pageX, pageY: event.pageY}});
     } catch(e) {
         console.warn("Chrome V engine problems");
+        removeAllEventListeners();
     }
 }
 
-function keyMapper(options) {
-    const eventType = hasProperty('eventType', options) && options.eventType || 'keydown';
-    document.removeEventListener(eventType, handleKeyboardInput);
-    document.addEventListener(eventType, handleKeyboardInput);   
+function keyMapper() {
+    document.removeEventListener('keydown', handleKeyboardInput);
+    document.addEventListener('keydown', handleKeyboardInput);   
 }
 
 function handleKeyboardInput(event) {
@@ -97,6 +97,7 @@ function handleKeyboardInput(event) {
         }
     } catch(e) {
         console.warn("Chrome V keyboard problems");
+        removeAllEventListeners();
     }
 }
 
@@ -116,4 +117,9 @@ function sendBufferData() {
 
 function hasProperty(property, object) {
     return object && object.hasOwnProperty(property);
+}
+
+function removeAllEventListeners() {
+    document.removeEventListener('click', handleMouseClick);
+    document.removeEventListener('keydown', handleKeyboardInput);
 }
