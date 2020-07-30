@@ -143,8 +143,7 @@ function addTabListeners() {
                     }
                     addDeviceEventListeners(tabId, activeTab.windowId, activeTab.url);
                     actionPostApi(currentToken, dataObj);
-                    //[TODO] Temporarily disabled
-                    // capturePageScreenshot(tabId, activeTab.windowId, activeTab.url);
+                    capturePageScreenshot(tabId, activeTab.windowId, activeTab.url);
                 }
             }
             // }
@@ -186,40 +185,61 @@ function capturePageScreenshot(tabId, windowId, url) {
     // chrome.browserAction.onClicked.addListener((tab)=> console.log("[DEBUG] TABSSS", tab));
     console.log("[DEBUG] Capturing Screenshot...");
     chrome.tabs.captureVisibleTab(windowId, { format: imageFormat }, (image) => {
-        // console.log("Capturing screenshot", image);
-        if (image) saveImage(image, imageFormat);
+        console.log("Capturing screenshot");
+        if (image) saveImage(image, imageFormat, {tabId, windowId, url});
     });
     // window.scrollTo(0,200);
 
 }
 
-function saveBlobAsFile(blob, fileName) {
-    let reader = new FileReader();
-    reader.readAsDataURL(blob);
+// function saveBlobAsFile(blob, fileName) {
+//     let reader = new FileReader();
+//     reader.readAsDataURL(blob);
 
-    reader.onload = function () {
-        var base64 = reader.result;
-        console.log("Image base64: ", base64);
-        var link = document.createElement("a");
+//     reader.onload = function () {
+//         var base64 = reader.result;
+//         console.log("Image base64: ", base64);
+//         var link = document.createElement("a");
 
-        document.body.appendChild(link); // for Firefox
+//         document.body.appendChild(link); // for Firefox
 
-        link.setAttribute("href", base64);
-        link.setAttribute("download", fileName);
-        link.click();
-    };
+//         link.setAttribute("href", base64);
+//         link.setAttribute("download", fileName);
+//         link.click();
+//     };
 
+// }
+
+async function saveImage(image, format, options) {
+    let blob = await dataURItoBlob(image);
+    let fd = new FormData(document.forms[0]);
+    // let fd = new FormData();
+    fd.set('image', blob, filename(format));
+    fd.append('action', 'screenshot');
+    fd.append('tabId', options.tabId);
+    fd.append('windowId', options.windowId);
+    fd.append('url', options.url);
+    imagePostApi(fd);
 }
 
-function saveImage(image, format) {
-    let link = document.createElement("a");
-    link.download = filename(format);
-    link.href = image;
-    link.click();
+async function dataURItoBlob(dataURI) {
+    // convert base64 to raw binary data held in a string
+    // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+    var byteString = atob(dataURI.split(',')[1]);
 
-    URL.revokeObjectURL(link.href);
+    // separate out the mime component
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
+    // write the bytes of the string to an ArrayBuffer
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([ab], {type: mimeString});
 }
+
 function filename(format) {
     var pad = (n) => (n = n + '', n.length >= 2 ? n : `0${n}`)
     var ext = (format) => format === 'jpeg' ? 'jpg' : format === 'png' ? 'png' : 'png'
@@ -254,4 +274,31 @@ function readConfig() {
                 console.warn("Forbidden", e);
         }
     });
+}
+
+function imagePostApi(formData) {
+    // dataObj['client_timestamp'] = Date.now();
+    formData.append('client_timestamp', Date.now());
+    let isValidAction = true;
+    if (isValidAction) {
+        console.log("[CONFIG] CURRENT ACTION TO RECORD ", formData);
+        $.ajax({
+            url: `${currentUrl}/api/users/actions`,
+            type: "POST",
+            headers: {
+                'Authorization': `Bearer ${currentToken}`,
+            },
+            data: formData,
+            contentType: false, //required for multipart
+            processData: false, //required for multipart
+            success: (data) => {
+                console.log("[ACTION][POST] Successful", data);
+            },
+            error: (err) => {
+                console.error("[ACTION]{POST} Unsuccesful ", err);
+            }
+        });
+    } else {
+        console.log("[CONFIG] NOT RECORDING ACTION %s", 'Image screenshot');
+    }
 }

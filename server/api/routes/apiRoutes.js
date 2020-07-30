@@ -1,9 +1,12 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const actionController = require('../controllers/actionController');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+
+const upload = multer().single('image');
 
 /**
  * @swagger
@@ -71,7 +74,7 @@ const authController = require('../controllers/authController');
  *         description: Successfully created
  */
 router.get('/users/actions', authController.verifyToken, actionController.list_all_actions);
-router.post('/users/actions', authController.verifyToken, actionController.create_new_action); 
+router.post('/users/actions', authController.verifyToken, upload, actionController.create_new_action); 
 
 // All user actions for a single user
 /**

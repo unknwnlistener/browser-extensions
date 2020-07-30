@@ -1,8 +1,16 @@
 const sgMail = require('@sendgrid/mail');
+const cloudinary = require('cloudinary').v2;
+const path = require('path');
+const Datauri = require('datauri/parser');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 // sgMail.setApiKey('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');
 
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_API_KEY,
+    api_secret: process.env.CLOUD_API_SECRET
+});
 
 exports.sendEmail = (mailOptions) => {
     return new Promise((resolve, reject) => {
@@ -13,6 +21,17 @@ exports.sendEmail = (mailOptions) => {
     });
 }
 
+exports.uploader = (req) => {
+    // console.log("[COMMON][UPLOADER] Req.file: ",req.file);
+    return new Promise((resolve, reject) => {
+        const dUri = new Datauri();
+        let image = dUri.format(path.extname(req.file.originalname).toString(), req.file.buffer);
+        cloudinary.uploader.upload(image.content, (err, url) => {
+            if (err) return reject(err);
+            return resolve(url);
+        })
+    });
+}
 
 
 // Additional Functions

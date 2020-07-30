@@ -31,11 +31,15 @@ exports.list_user_actions = (req, res) => {
 
 /* #region  POST calls */
 
-exports.create_new_action = (req, res) => {
+exports.create_new_action = async (req, res) => {
     let currentUser = req.userId;
     console.log("%s POST call invoked", consolePrefix);
     console.log(consolePrefix + "New action : ", req.body);
-
+    if(req.body.action === 'screenshot') {
+        let url = await getImageUrl(req, res);
+        console.log("%s URL of image : ", consolePrefix, url);
+        req.body.imageUrl = url;
+    }
     // [TODO] Shift all these actions to its own repositories
     req.body.userId = currentUser;
     let new_action = new Action(req.body);
@@ -49,3 +53,9 @@ exports.create_new_action = (req, res) => {
 
 };
 /* #endregion */
+
+async function getImageUrl(req, res) {
+    if (!req.file) return common.error_send(res, { message: 'Image file not found'}, 404);
+    const result = await common.uploader(req);
+    return result.url;
+}
