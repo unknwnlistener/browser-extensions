@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 
-const authController = require('../controllers/authController');
+const Auth = require('../controllers/authController');
 
 /**
  * @swagger
@@ -56,7 +56,7 @@ const authController = require('../controllers/authController');
  *       200:
  *         description: Successfully authenticated
  */
-router.post('/login', authController.login_user);
+router.post('/login', Auth.login_user);
 
 /**
  * @swagger
@@ -78,7 +78,7 @@ router.post('/login', authController.login_user);
  *       200:
  *         description: Successfully registered
  */
-router.post('/register', authController.register_user);
+router.post('/register', Auth.register_user);
 
 
 // Config Route
@@ -112,7 +112,13 @@ router.post('/register', authController.register_user);
  *         schema:
  *           $ref: '#/definitions/Config'
  */
-router.get('/config', authController.verifyToken, authController.get_config);
-router.put('/config', authController.verifyToken, authController.update_config);
+router.get('/config', Auth.verifyToken, Auth.get_config);
+router.put('/config', Auth.verifyToken, Auth.update_config);
+
+
+//EMAIL Verification
+router.get('/verify/:token', Auth.verify_user);
+router.post('/resend', Auth.resendToken);
+
 
 module.exports = router;

@@ -1,34 +1,47 @@
 require('dotenv').config();
 
 const express = require('express');
-const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 require('./server/api/models/actionModel').default; 
 require('./server/api/models/userModel').default; 
+require('./server/api/models/tokenModel').default; 
 
 const connUri = process.env.DB_CONNECTION;
 let port = process.env.PORT || 3000;
 
-// mongoose instance connection url connection
+// CREATE APP
+const app = express();
+app.use(cors());
+
+// SET UP DATABASE
 mongoose.Promise = global.Promise;
 mongoose.connect(connUri, (err) => {
     if(err) { console.log("UNSUCCESSFUL : ",err); }
 }); 
-console.log("DB Connected successfully");
+const connection = mongoose.connection;
+connection.once('open', () => console.log('MongoDB --  database connection established successfully!'));
+connection.on('error', (err) => {
+    console.log("MongoDB connection error. Please make sure MongoDB is running. " + err);
+    process.exit();
+});
 
-var swagger = require('./swagger'); // configure swagger
+// CONFIGURE SWAGGER
+var swagger = require('./swagger'); 
 swagger(app);
 
+// PARSER SET UP
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static("./client/public"));
 
-let auth = require('./server/api/routes/authRoutes');
-app.use('/api', auth);
-
-let api = require('./server/api/routes/apiRoutes'); //importing routes
+// IMPORTING ROUTES
+let api = require('./server/api/routes/apiRoutes'); 
 app.use('/api', api); //register the route
+
+let auth = require('./server/api/routes/authRoutes');
+app.use('/api/auth', auth);
 
 app.use(function(req, res) {
     res.status(404).send({url: req.originalUrl + ' not found'})

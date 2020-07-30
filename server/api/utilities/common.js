@@ -1,3 +1,20 @@
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// sgMail.setApiKey('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');
+
+
+exports.sendEmail = (mailOptions) => {
+    return new Promise((resolve, reject) => {
+        sgMail.send(mailOptions, (error, result) => {
+            if (error) return reject(error);
+            return resolve(result);
+        });
+    });
+}
+
+
+
 // Additional Functions
 /*
 * Deprected: Following the format of sending data packets in {data: null, errors: [{type : 'warning', message: 'Group not found'} ]}

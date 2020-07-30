@@ -106,6 +106,7 @@ function readConfig() {
                 config.actions = JSON.parse(JSON.stringify(data.data));
             }
             console.log("Config file received = ", data);
+            // TEST MODE for Development
             $(".test-mode").css("display", "block");
             $(".settings").html(generateToggleRows());
             Cookies.set('config', config, {expires: cookieExpireDays});
