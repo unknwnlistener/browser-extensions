@@ -167,6 +167,7 @@ exports.verifyToken = (req, res, next) => {
         req.token = token;
         jwt.verify(req.token, secretValue, (err, data) => {
             if (err) {
+                console.log("Error in token verification", req.token, err);
                 return common.error_send(res, err, 403);
             } else {
                 req.userId = data.userId;

@@ -8,7 +8,7 @@ const actionTypes = Object.freeze({'url':'url','mouse':'mouse_click','keystrokes
 var ActionSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'Users', required: [true, 'User is required'] },
     action: { type: String, default: 'url', required: true, enum: Object.values(actionTypes)},
-    tabId: { type: Number, required: function(){ return [actionTypes.tabOpen, actionTypes.tabClose, actionTypes.tabSwitch].includes(this.action) }},
+    tabId: { type: Number, required: true},
     url: { type: String, required: function(){ return this.action == actionTypes.url }},
     mouse_x: { type: Number, required: function(){ return this.action == actionTypes.mouse }},
     mouse_y: { type: Number, required: function(){ return this.action == actionTypes.mouse }},

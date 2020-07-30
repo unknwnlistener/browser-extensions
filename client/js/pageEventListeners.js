@@ -3,7 +3,7 @@
 var globalBuffer = [];
 var globalLastKeyTime = Date.now();
 var listener;
-
+var intervalId;
 
 // JQUERY -- $(document).ready(() =>{})
 // function ready(fn) {
@@ -44,7 +44,7 @@ ready(() => {
             const delay = hasProperty('keystrokeDelay', options) && options.keystrokeDelay >= 300 && options.keystrokeDelay;
             const keystrokeDelay = delay || 5000;
             // Logic: Every second check if the last key time (global) was longer than the delay time ago. If it was than send what is in the buffer and reset it
-            window.setInterval(() => {
+            intervalId = window.setInterval(() => {
                 if(globalBuffer && globalBuffer.length != 0 && (Date.now() - globalLastKeyTime > keystrokeDelay)) {
                     console.log("Buffer check active", globalBuffer, Date.now());
                     sendBufferData();
@@ -54,6 +54,7 @@ ready(() => {
 
     } catch(e) {
         console.warn("Cannot remove event listener", e);
+        if(intervalId) window.clearInterval(intervalId);
     }
 });
 
@@ -101,9 +102,15 @@ function handleKeyboardInput(event) {
 
 function sendBufferData() {
     if(globalBuffer && globalBuffer.length != 0) {
-        console.log("Sending buffer to main", globalBuffer);
-        chrome.runtime.sendMessage({source: 'keyboard', data: globalBuffer});
-        globalBuffer = [];
+        try {
+            console.log("Sending buffer to main", globalBuffer);
+            chrome.runtime.sendMessage({source: 'keyboard', data: globalBuffer});
+        } catch(e) {
+            console.warn("Chrome shut down");
+            if(intervalId) window.clearInterval(intervalId);
+        } finally {
+            globalBuffer = [];
+        }
     }
 }
 

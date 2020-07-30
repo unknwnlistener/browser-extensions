@@ -38,9 +38,11 @@ $(document).ready(() => {
     // Listener for cookies
     chrome.runtime.onMessage.addListener((request, sender, res) => {
         if (Cookies.get('token')) {
-            readConfig();
+            // readConfig();
             if (request.source === "popup") {
                 console.log("[BACKGROUND][COOKIES] : ", request, Cookies.get('token'), Cookies.get('config'));
+                currentToken = Cookies.get('token');
+                readConfig();
                 addTabListeners();
             } else if (request.source === "target") {
                 let mouseEvent = request.mouse;
@@ -48,21 +50,21 @@ $(document).ready(() => {
 
                 dataObj = {
                     action: 'mouse_click',
-                    tabId: activeTabList.tabId,
-                    url: activeTabList.url,
-                    windowId: activeTabList.windowId,
+                    tabId: sender.tab.id,
+                    url: sender.tab.url,
+                    windowId: sender.tab.windowId,
                     mouse_x: mouseEvent.pageX,
                     mouse_y: mouseEvent.pageY
                 }
                 actionPostApi(currentToken, dataObj);
             } else if (request.source === "keyboard") {
                 let keyEvent = request.data;
-                console.log("Keyboard event recorded ", keyEvent.join(' '));
+                console.log("Keyboard event recorded ", request, keyEvent.join(' '));
                 dataObj = {
                     action: 'keystrokes',
-                    tabId: activeTabList.tabId,
-                    url: activeTabList.url,
-                    windowId: activeTabList.windowId,
+                    tabId: sender.tab.id,
+                    url: sender.tab.url,
+                    windowId: sender.tab.windowId,
                     keys: keyEvent.join(' ')
                 }
                 actionPostApi(currentToken, dataObj);
@@ -90,7 +92,7 @@ function actionPostApi(currentToken, dataObj) {
     dataObj['client_timestamp'] = Date.now();
     let isValidAction = checkEnabledAction(dataObj['action']);
     if (isValidAction) {
-        console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action']);
+        console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action'], currentToken);
         $.ajax({
             url: `${currentUrl}/api/users/actions`,
             type: "POST",
@@ -133,7 +135,6 @@ function addTabListeners() {
                     actionPostApi(currentToken, dataObj);
                 } else if (activeTab.url && (activeTab.url.startsWith('https://') || activeTab.url.startsWith('http://'))) {
                     // Info to store -- url, tabId, windowId
-                    console.log("%c[DEBUG]...Recording new URL....", "color: blue; font-size: 14px;");
                     let dataObj = {
                         action: 'url',
                         tabId: tabId,
@@ -163,17 +164,16 @@ function addTabListeners() {
 }
 
 function addDeviceEventListeners(tabId, windowId, url) {
-    // Mouseclick actions
-    if(!activeTabList.includes(tabId)) {
-        activeTabList.push(tabId);
-        // IDEA: Instead of listenening to every active tab being highlighted, what if listeners were added to every new URL. This way even if the user is on the same tab and continues surfing, mouseclick listeners will always be present.
+    // if(!activeTabList.includes(tabId)) {
+    //     activeTabList.push(tabId);
+    //     // IDEA: Instead of listenening to every active tab being highlighted, what if listeners were added to every new URL. This way even if the user is on the same tab and continues surfing, mouseclick listeners will always be present.
         // Mouseclick event gets reset when a new url is navigated to in the same tab
 
         // TEST -- Change urls on the same page and see how many listeners get added
         chrome.tabs.executeScript(tabId, { file: './js/pageEventListeners.js' }, () => {
             console.log("[CALLBACK] Injected script in other page");
         });
-    }
+    // }
 }
 
 function capturePageScreenshot(tabId, windowId, url) {

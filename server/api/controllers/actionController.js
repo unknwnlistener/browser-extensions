@@ -40,7 +40,10 @@ exports.create_new_action = (req, res) => {
     req.body.userId = currentUser;
     let new_action = new Action(req.body);
     new_action.save((err, saveRes) => {
-        if (err) return common.error_send(res, err, 400);
+        if (err) {
+            console.warn('Action could not be saved', err);
+            return common.error_send(res, err, 400);
+        }
         return common.result_send(res, saveRes, null, 201, 'New action created');
     });
 
