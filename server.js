@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const cors = require('cors');
+// const cors = require('cors');
 require('./server/api/models/actionModel').default; 
 require('./server/api/models/userModel').default; 
 require('./server/api/models/tokenModel').default; 
@@ -13,7 +13,7 @@ let port = process.env.PORT || 3000;
 
 // CREATE APP
 const app = express();
-app.use(cors());
+// app.use(cors());
 
 // SET UP DATABASE
 mongoose.Promise = global.Promise;
@@ -41,7 +41,7 @@ let api = require('./server/api/routes/apiRoutes');
 app.use('/api', api); //register the route
 
 let auth = require('./server/api/routes/authRoutes');
-app.use('/api/auth', auth);
+app.use('/api', auth);
 
 app.use(function(req, res) {
     res.status(404).send({url: req.originalUrl + ' not found'})

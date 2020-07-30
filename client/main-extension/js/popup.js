@@ -1,6 +1,6 @@
 // Passing data through REST APIs to Node server
-// const currentUrl = 'http://localhost:3000';
-const currentUrl = 'https://ancient-coast-51172.herokuapp.com'; 
+const currentUrl = 'http://localhost:3000';
+// const currentUrl = 'https://ancient-coast-51172.herokuapp.com'; 
 // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWRhMTc2ZmMwMjA3YzQxMDBlM2JiYTkiLCJpYXQiOjE1OTEzNTExNTF9.-HonhXPYV2S0DUyNNStY9qeGqWCW5M_IkNlrlmrx3bs';
 
 let config = {};
@@ -107,8 +107,8 @@ function readConfig() {
             }
             console.log("Config file received = ", data);
             // TEST MODE for Development
-            $(".test-mode").css("display", "block");
-            $(".settings").html(generateToggleRows());
+            // $(".test-mode").css("display", "block");
+            // $(".settings").html(generateToggleRows());
             Cookies.set('config', config, {expires: cookieExpireDays});
             chrome.storage.sync.set({'config': config}, function() {
                 console.log("[POPUP] Chrome storage value is set to ", config);

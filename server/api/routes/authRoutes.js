@@ -117,8 +117,8 @@ router.put('/config', Auth.verifyToken, Auth.update_config);
 
 
 //EMAIL Verification
-router.get('/verify/:token', Auth.verify_user);
-router.post('/resend', Auth.resendToken);
+// router.get('/verify/:token', Auth.verify_user);
+// router.post('/resend', Auth.resendToken);
 
 
 module.exports = router;

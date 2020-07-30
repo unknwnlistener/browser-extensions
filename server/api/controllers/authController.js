@@ -44,27 +44,33 @@ exports.login_user = async (req, res) => {  //ToDO: wrap into a result model
     }   
 }
 
-exports.register_user = async (req, res) => { //ToDO: wrap into a result model
+exports.register_user = async (req, res) => { 
     try{
         let user = req.body;
         let existingUser = await User.findOne({email: user.email});
         if (existingUser) {
-            // res.send('user exists');
             return common.error_send(res, {message: 'The email address you have entered is already associated with another account'}, 401);
         }
 
         if (!validateEmail(user.email)) {
-            // res.send('invalid email');
             return common.error_send(res, {message: 'Email format is invalid'}, 400);
         }
 
         let passHash = bcrypt.hashSync(user.password, 10);
         user.password = passHash;
+        user.isVerified = true;
         
         let newUser = new User(user);
-        const user_ = await newUser.save();
-
-        await sendVerificationEmail(user_, req, res);
+        
+        // Verify and save the new user
+        await newUser.save(function (err) {
+            if (err) return common.error_send(res, {message:err.message}, 500);
+            
+            common.result_send(res, {message: "The account has been verified. Please log in."});
+        });
+        
+        // const user_ = await newUser.save();
+        // await sendVerificationEmail(user_, req, res);
     } catch(e) {
         return common.error_send(res, e, 500);
     }
