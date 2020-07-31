@@ -1,6 +1,6 @@
-const currentUrl = 'http://localhost:3000';
+// const currentUrl = 'http://localhost:3000';
 // const currentUrl = 'https://ancient-coast-51172.herokuapp.com'; 
-
+const currentUrl = getCurrentUrl();
 /* Record and send a post command for every new action
 1. Console log different actions
     a. New url entered
