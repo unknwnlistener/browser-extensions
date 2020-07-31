@@ -17,7 +17,7 @@ const app = express();
 
 // SET UP DATABASE
 mongoose.Promise = global.Promise;
-mongoose.connect(connUri, (err) => {
+mongoose.connect(connUri, { useUnifiedTopology: true, useNewUrlParser: true }, (err) => {
     if(err) { console.log("UNSUCCESSFUL : ",err); }
 }); 
 const connection = mongoose.connection;
