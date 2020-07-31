@@ -36,7 +36,7 @@ exports.login_user = async (req, res) => {  //ToDO: wrap into a result model
         }, (err, token) => {
             if(err) return common.error_send(res, err, 403);
             // res.json({ token });
-            return common.result_send(res, {token: token}, null);
+            return common.result_send(res, {token: token}, null, 202);
         });
     }
     catch(e) {
@@ -66,7 +66,7 @@ exports.register_user = async (req, res) => {
         await newUser.save(function (err) {
             if (err) return common.error_send(res, {message:err.message}, 500);
             
-            common.result_send(res, {message: "The account has been verified. Please log in."});
+            common.result_send(res, {message: "The account has been verified. Please log in."}, null, 201);
         });
         
         // const user_ = await newUser.save();

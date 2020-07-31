@@ -16,8 +16,8 @@ const upload = multer().single('image');
  *       action:
  *         type: string
  *         enum: [url, mouse, key, tab_opened, tab_closed, tab_switch]
- *       tab:
- *         type: string
+ *       tabId:
+ *         type: number
  *       url:
  *         type: string
  *       mouse_x:
@@ -25,6 +25,10 @@ const upload = multer().single('image');
  *       mouse_y:
  *         type: number
  *       keys:
+ *         type: string
+ *       windowId:
+ *         type: number
+ *       client_timestamp:
  *         type: string
  *   users:
  *     properties:

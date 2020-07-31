@@ -4,7 +4,8 @@ Project codebase as per the requirement of MSc in Computer Science (Software Eng
 ### Usage
 The following steps are to start a node server locally:
 * Go to root folder of project
-* Run `node .\server.js` in the terminal
+* In the terminal, run `npm install` to install all node dependencies
+* then run `node .\server.js` to startup the server
 
 To setup the tool for conducting a new experiment, we followed the following steps 
 1.	Install Chrome or a Chromium based browser (e.g. Brave) on the machine.
