@@ -167,11 +167,11 @@ exports.verifyToken = (req, res, next) => {
         req.token = token;
         jwt.verify(req.token, secretValue, (err, data) => {
             if (err) {
-                console.log("Error in token verification", req.token, err);
+                console.warn("Error in token verification", req.token, err);
                 return common.error_send(res, err, 403);
             } else {
                 req.userId = data.userId;
-                console.log('Authorized user id is: ', req.userId);
+                // console.log('Authorized user id is: ', req.userId);
                 next();
             }
         });
@@ -194,13 +194,13 @@ exports.get_config = (req, res) => {
 
 exports.update_config = (req, res) => {
     let config = req.body;
-    console.log("Begin updating config");
+    // console.log("Begin updating config");
     try {
-        console.log("Updated config file", config);
+        // console.log("Updated config file", config);
         fs.writeFileSync(path.join(__dirname,'../../', 'config.json'), JSON.stringify(config.actions), 'utf-8');
         return common.result_send(res, config.actions, null);
     } catch (e) {
-        console.log("Error", e);
+        console.error("Config update Error", e);
         return common.error_send(res, e, 404);
     }
     // return common.result_send(res, null, null);

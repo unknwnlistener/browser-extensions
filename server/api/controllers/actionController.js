@@ -33,11 +33,11 @@ exports.list_user_actions = (req, res) => {
 
 exports.create_new_action = async (req, res) => {
     let currentUser = req.userId;
-    console.log("%s POST call invoked", consolePrefix);
-    console.log(consolePrefix + "New action : ", req.body);
+    // console.log("%s POST call invoked", consolePrefix);
+    // console.log(consolePrefix + "New action : ", req.body);
     if(req.body.action === 'screenshot') {
         let url = await getImageUrl(req, res);
-        console.log("%s URL of image : ", consolePrefix, url);
+        // console.log("%s URL of image : ", consolePrefix, url);
         req.body.imageUrl = url;
     }
     // [TODO] Shift all these actions to its own repositories
