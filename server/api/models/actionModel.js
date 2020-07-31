@@ -18,7 +18,7 @@ var ActionSchema = new Schema({
     imageUrl: {type: String, requied: function(){ return this.action == actionTypes.screenshot }}
 },
 {
-    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at', currentTime: () => Date.now()}, // [TODO] This may not work. Revisit
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at', currentTime: () => Date.now()}, 
 });
 
 ActionSchema.plugin(idValidator);

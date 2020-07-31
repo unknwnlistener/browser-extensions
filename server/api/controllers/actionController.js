@@ -11,7 +11,7 @@ in temporal order (latest entry first, first entry last):
 */
 exports.list_all_actions = (req, res) => {
     console.log("%s Returning all actions for all users", consolePrefix);
-    Action.find({}, null, {limit: 5, sort: '-created_at'}, (err, actions) => { //[TODO] Update limit of this call. Testing = 5
+    Action.find({}, null, {limit: 10000, sort: '-created_at'}, (err, actions) => { 
         if(err) return common.error_send(res, err, 404);
         return common.result_send(res, actions, null, 200, "Returning actions for all users");
     });
@@ -19,7 +19,6 @@ exports.list_all_actions = (req, res) => {
 
 exports.list_user_actions = (req, res) => {
     let userId = req.params.userId;
-    console.log("%s GET user id: %d actions", consolePrefix, userId);
     
     Action.find({ userId: userId }, (err, actions) => {
         if (err) return common.error_send(res, err, 404);
@@ -40,7 +39,6 @@ exports.create_new_action = async (req, res) => {
         // console.log("%s URL of image : ", consolePrefix, url);
         req.body.imageUrl = url;
     }
-    // [TODO] Shift all these actions to its own repositories
     req.body.userId = currentUser;
     let new_action = new Action(req.body);
     new_action.save((err, saveRes) => {

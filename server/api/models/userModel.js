@@ -1,8 +1,6 @@
 'use strict';
 var mongoose = require('mongoose');
 var idValidator = require('mongoose-id-validator');
-// [TODO] AUto incremented field may be detrimental
-// const autoIncrement = require('mongoose-sequence')(mongoose);
 
 var Schema = mongoose.Schema;
 

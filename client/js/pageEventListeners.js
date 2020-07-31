@@ -16,12 +16,10 @@ var intervalId;
 // }
 function ready(fn) {
     if(document.readyState != 'loading') {
-        console.log("Page load complete");
         fn();
     } else {
         document.addEventListener('readystatechange', event => {
             if(event.target.readyState != 'loading') {
-                console.log("Page load after listening");
                 fn();
             }
         })
@@ -46,7 +44,6 @@ ready(() => {
             // Logic: Every second check if the last key time (global) was longer than the delay time ago. If it was than send what is in the buffer and reset it
             intervalId = window.setInterval(() => {
                 if(globalBuffer && globalBuffer.length != 0 && (Date.now() - globalLastKeyTime > keystrokeDelay)) {
-                    console.log("Buffer check active", globalBuffer, Date.now());
                     sendBufferData();
                 }
             }, 1000); // 1 seconds
@@ -60,10 +57,9 @@ ready(() => {
 
 function handleMouseClick(event) {
     try {
-        console.log("Event before sending", event);
         chrome.runtime.sendMessage({source: 'target', mouse: {pageX: event.pageX, pageY: event.pageY}});
     } catch(e) {
-        console.warn("Chrome V engine problems");
+        console.warn("Chrome engine server issue");
         removeAllEventListeners();
     }
 }
@@ -96,7 +92,7 @@ function handleKeyboardInput(event) {
             sendBufferData();
         }
     } catch(e) {
-        console.warn("Chrome V keyboard problems");
+        console.warn("Chrome keyboard issue");
         removeAllEventListeners();
     }
 }
@@ -104,7 +100,6 @@ function handleKeyboardInput(event) {
 function sendBufferData() {
     if(globalBuffer && globalBuffer.length != 0) {
         try {
-            console.log("Sending buffer to main", globalBuffer);
             chrome.runtime.sendMessage({source: 'keyboard', data: globalBuffer});
         } catch(e) {
             console.warn("Chrome shut down");

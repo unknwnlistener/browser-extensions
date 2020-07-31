@@ -12,13 +12,11 @@ $(function() {
 
     $('#submit').on('click', function(event) {
         if(!isInvalidEmail && !isInvalidPassword) {
-            console.log($('#register-form').serialize());
             $.ajax({
                 url: `${currentUrl}/api/register`,
                 type: 'POST',
                 data: $('#register-form').serialize(),
                 success: function (data) {
-                    console.log("Success", data);
                     successfulLogin();
                     // window.location.href = "/dashboard.html";
                 },

@@ -33,7 +33,6 @@ $(document).ready(() => {
 
     // REST call to login
     $('#login').click((e) => {
-        console.log("Logging the user in...");
 
         $.ajax({
             url: `${currentUrl}/api/login`,
@@ -47,8 +46,8 @@ $(document).ready(() => {
                 $('.main').replaceWith(loggedInMessageHtml());
                 readConfig();
             },
-            error: () => {
-                console.log("Invalid credentials entered", "color: red;");
+            error: (err) => {
+                console.log("Invalid credentials entered", "color: red;", err);
                 $('.error-msg').css('display', 'block');
             }
         });
@@ -105,7 +104,6 @@ function readConfig() {
             if(data.status) {
                 config.actions = JSON.parse(JSON.stringify(data.data));
             }
-            console.log("Config file received = ", data);
             // TEST MODE for Development
             // $(".test-mode").css("display", "block");
             // $(".settings").html(generateToggleRows());
@@ -120,7 +118,7 @@ function readConfig() {
             if(e.status != 403)
                 console.error("Could not read config", e);
             else
-                console.log("Forbidden", e);
+                console.warn("Forbidden", e);
         }
     });
 }
@@ -144,22 +142,17 @@ function generateToggleRows() {
     return html;
 }
 
-// Updates the config={} object. [TODO] Send that config to server and the server will handle that config to send data
 function setConfigToggle() {
-    console.log("Setting test button values : ", JSON.stringify(config));
     $('input:checkbox').change(function(){
         if(($(this)).is(':checked')) {
-            console.log("Checked config : ",$(this).attr('id'), true);
             config.actions[$(this).attr('id')]["active"] = true;
         } else {
-            console.log("Unchecked config : ",$(this).attr('id'), false);
             config.actions[$(this).attr('id')]["active"] = false;
         }
         $('#test-submit').removeAttr('disabled');
     });
     // Update config
     $('#test-submit').click(function() {
-        console.log("Sending new config settings");
         $.ajax({
             url: `${currentUrl}/api/config`,
             type: "PUT",
@@ -173,7 +166,6 @@ function setConfigToggle() {
                 }
                 Cookies.set('config', config, {expires: cookieExpireDays});
                 chrome.storage.sync.set({'config': config}, function() {
-                    console.log("[POPUP] Chrome storage value is set to ", config);
                 });
                 chrome.runtime.sendMessage({source: "popup", token: Cookies.get('token')});
                 location.reload(false);

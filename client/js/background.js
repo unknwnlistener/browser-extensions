@@ -23,7 +23,7 @@ var activeTabList = [];
 let isSetListeners = false;
 
 $(document).ready(() => {
-    console.log("[BACKGROUND] Loaded page", Cookies.get('token'), Cookies.get('config'));
+    console.log("[BACKGROUND] Page loaded", Cookies.get('token'), Cookies.get('config'));
 
     // chrome.windows.getCurrent((activeWindow) => {
     //     currentWindowId = activeWindow.id;
@@ -40,14 +40,11 @@ $(document).ready(() => {
         if (Cookies.get('token')) {
             // readConfig();
             if (request.source === "popup") {
-                console.log("[BACKGROUND][COOKIES] : ", request, Cookies.get('token'), Cookies.get('config'));
                 currentToken = Cookies.get('token');
                 readConfig();
                 addTabListeners();
             } else if (request.source === "target") {
                 let mouseEvent = request.mouse;
-                console.log("[MESSAGE SEND] Mouse event sent", request);
-
                 dataObj = {
                     action: 'mouse_click',
                     tabId: sender.tab.id,
@@ -59,7 +56,6 @@ $(document).ready(() => {
                 actionPostApi(currentToken, dataObj);
             } else if (request.source === "keyboard") {
                 let keyEvent = request.data;
-                console.log("Keyboard event recorded ", request, keyEvent.join(' '));
                 dataObj = {
                     action: 'keystrokes',
                     tabId: sender.tab.id,
@@ -92,7 +88,6 @@ function actionPostApi(currentToken, dataObj) {
     dataObj['client_timestamp'] = Date.now();
     let isValidAction = checkEnabledAction(dataObj['action']);
     if (isValidAction) {
-        console.log("[CONFIG] CURRENT ACTION TO RECORD ", dataObj['action']);
         $.ajax({
             url: `${currentUrl}/api/users/actions`,
             type: "POST",
@@ -107,8 +102,8 @@ function actionPostApi(currentToken, dataObj) {
                 console.error("[ACTION]{POST} Unsuccesful ", err);
             }
         });
-    } else {
-        console.log("[CONFIG] NOT RECORDING ACTION %s", dataObj['action']);
+    // } else {
+    //     console.log("[CONFIG] Not recording %s", dataObj['action']);
     }
 }
 
@@ -121,7 +116,6 @@ function checkEnabledAction(action) {
 function addTabListeners() {
     // Named callback for the event listener so that the listener can be removed later
     if (!isSetListeners) {
-        console.log("[BACKGROUND] Adding listener for tabs");
         isSetListeners = true;
         chrome.tabs.onUpdated.addListener(tabUpdates = (tabId, changeInfo, activeTab) => {
             // if (activeTab.windowId == currentWindowId) {
@@ -176,44 +170,16 @@ function addDeviceEventListeners(tabId, windowId, url) {
 }
 
 function capturePageScreenshot(tabId, windowId, url) {
-    // let dataObj = {
-    //     tabId: tabId,
-    //     windowId: windowId,
-    //     url: url
-    // }
     let imageFormat = 'jpeg';
-    // chrome.browserAction.onClicked.addListener((tab)=> console.log("[DEBUG] TABSSS", tab));
-    console.log("[DEBUG] Capturing Screenshot...");
     chrome.tabs.captureVisibleTab(windowId, { format: imageFormat }, (image) => {
-        console.log("Capturing screenshot");
         if (image) saveImage(image, imageFormat, {tabId, windowId, url});
     });
-    // window.scrollTo(0,200);
 
 }
-
-// function saveBlobAsFile(blob, fileName) {
-//     let reader = new FileReader();
-//     reader.readAsDataURL(blob);
-
-//     reader.onload = function () {
-//         var base64 = reader.result;
-//         console.log("Image base64: ", base64);
-//         var link = document.createElement("a");
-
-//         document.body.appendChild(link); // for Firefox
-
-//         link.setAttribute("href", base64);
-//         link.setAttribute("download", fileName);
-//         link.click();
-//     };
-
-// }
 
 async function saveImage(image, format, options) {
     let blob = await dataURItoBlob(image);
     let fd = new FormData(document.forms[0]);
-    // let fd = new FormData();
     fd.set('image', blob, filename(format));
     fd.append('action', 'screenshot');
     fd.append('tabId', options.tabId);
@@ -236,7 +202,6 @@ async function dataURItoBlob(dataURI) {
     for (var i = 0; i < byteString.length; i++) {
         ia[i] = byteString.charCodeAt(i);
     }
-
     return new Blob([ab], {type: mimeString});
 }
 
@@ -264,7 +229,6 @@ function readConfig() {
             }
             Cookies.set('config', config, {expires: 1});
             chrome.storage.sync.set({'config': config}, function() {
-                console.log("[BG] Chrome storage value is set to ", config);
             });
         },
         error: (e) => {
@@ -281,7 +245,6 @@ function imagePostApi(formData) {
     formData.append('client_timestamp', Date.now());
     let isValidAction = true;
     if (isValidAction) {
-        console.log("[CONFIG] CURRENT ACTION TO RECORD ", formData);
         $.ajax({
             url: `${currentUrl}/api/users/actions`,
             type: "POST",
@@ -299,6 +262,6 @@ function imagePostApi(formData) {
             }
         });
     } else {
-        console.log("[CONFIG] NOT RECORDING ACTION %s", 'Image screenshot');
+        console.log("[CONFIG] NOT RECORDING Image screenshot");
     }
 }

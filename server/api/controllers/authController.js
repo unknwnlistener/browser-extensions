@@ -15,7 +15,7 @@ const Token = mongoose.model('Tokens');
 let fs = require('fs');
 const path = require('path');
 
-exports.login_user = async (req, res) => {  //ToDO: wrap into a result model
+exports.login_user = async (req, res) => {  
     try {
         const { email, password } = req.body;
         var user = await User.findOne({email: email});
@@ -110,48 +110,47 @@ exports.verify_user = async (req, res) => {
     }
 }
 
-exports.resendToken = async (req, res) => {
-    try {
-        const { email } = req.body;
+// exports.resendToken = async (req, res) => {
+//     try {
+//         const { email } = req.body;
 
-        const user = await User.findOne({ email });
+//         const user = await User.findOne({ email });
 
-        if (!user) return common.error_send(res, { message: 'The email address ' + req.body.email + ' is not associated with any account. Double-check your email address and try again.'}, 401);
+//         if (!user) return common.error_send(res, { message: 'The email address ' + req.body.email + ' is not associated with any account. Double-check your email address and try again.'}, 401);
 
-        if (user.isVerified) return common.error_send(res, { message: 'This account has already been verified. Please log in.'}, 400);
-        console.log("Before sending");
-        await sendVerificationEmail(user, req, res);
-    } catch (error) {
-        res.status(500).json({message: error.message})
-    }
-};
+//         if (user.isVerified) return common.error_send(res, { message: 'This account has already been verified. Please log in.'}, 400);
+//         await sendVerificationEmail(user, req, res);
+//     } catch (error) {
+//         res.status(500).json({message: error.message})
+//     }
+// };
 
-async function sendVerificationEmail(user, req, res){
-    try{
-        // const token = user.generateVerificationToken();
-        let payload = {
-            userId: user._id,
-            token: crypto.randomBytes(20).toString('hex')
-        }
-        const token = new Token(payload);
+// async function sendVerificationEmail(user, req, res){
+//     try{
+//         // const token = user.generateVerificationToken();
+//         let payload = {
+//             userId: user._id,
+//             token: crypto.randomBytes(20).toString('hex')
+//         }
+//         const token = new Token(payload);
 
-        // Save the verification token
-        await token.save();
+//         // Save the verification token
+//         await token.save();
 
-        let subject = "Account Verification Token";
-        let to = user.email;
-        let from = process.env.FROM_EMAIL;
-        let link="http://"+req.headers.host+"/api/auth/verify/"+token.token;
-        let html = `<p>Hi ${user.username}<p><br><p>Please click on the following <a href="${link}">link</a> to verify your account.</p> 
-                  <br><p>If you did not request this, please ignore this email.</p>`;
+//         let subject = "Account Verification Token";
+//         let to = user.email;
+//         let from = process.env.FROM_EMAIL;
+//         let link="http://"+req.headers.host+"/api/auth/verify/"+token.token;
+//         let html = `<p>Hi ${user.username}<p><br><p>Please click on the following <a href="${link}">link</a> to verify your account.</p> 
+//                   <br><p>If you did not request this, please ignore this email.</p>`;
 
-        await common.sendEmail({to: to, from: from, subject: subject, html: html});
+//         await common.sendEmail({to: to, from: from, subject: subject, html: html});
 
-        common.result_send(res, {message: 'A verification email has been sent to ' + user.email + '.'});
-    }catch (error) {
-        common.error_send(res, {message: error}, 500);
-    }
-}
+//         common.result_send(res, {message: 'A verification email has been sent to ' + user.email + '.'});
+//     }catch (error) {
+//         common.error_send(res, {message: error}, 500);
+//     }
+// }
 
 function validateEmail(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -161,7 +160,6 @@ function validateEmail(email) {
 exports.verifyToken = (req, res, next) => {
     let bearerHeader = req.headers['authorization'];
     if (bearerHeader) {
-        // [TODO] Improve this header retrieval of the token
         // Current format: Bearer <token>
         let token = bearerHeader.split(' ')[1];
         req.token = token;
@@ -182,10 +180,8 @@ exports.verifyToken = (req, res, next) => {
 }
 
 exports.get_config = (req, res) => {
-    // console.log("CONFIG path : ", path.join(__dirname,'../../', 'config.json'));
     try {
         let configJson = JSON.parse(fs.readFileSync(path.join(__dirname,'../../', 'config.json')));
-        // console.log("CONFIG : ", configJson);
         return common.result_send(res, configJson, null, 200, "Config data successfully passed"); 
     } catch (e) {
         return common.error_send(res, e, 404);
@@ -194,14 +190,11 @@ exports.get_config = (req, res) => {
 
 exports.update_config = (req, res) => {
     let config = req.body;
-    // console.log("Begin updating config");
     try {
-        // console.log("Updated config file", config);
         fs.writeFileSync(path.join(__dirname,'../../', 'config.json'), JSON.stringify(config.actions), 'utf-8');
         return common.result_send(res, config.actions, null);
     } catch (e) {
         console.error("Config update Error", e);
         return common.error_send(res, e, 404);
     }
-    // return common.result_send(res, null, null);
 }
